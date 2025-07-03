@@ -1,14 +1,14 @@
-local LBLG = Instance.new("ScreenGui")
-local LBL = Instance.new("TextLabel")
+local LBLG = Instance.new("ScreenGui", getParent)
+local LBL = Instance.new("TextLabel", getParent)
 local Workspace = game:GetService("Workspace")
 local player = game.Players.LocalPlayer
+local getParent = game.CoreGui
+local CoreGui = game:GetService("StarterGui")
 
--- 修正1：确保正确的parent设置
 LBLG.Name = "LBLG"
 LBLG.Parent = game.CoreGui
 LBLG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 LBLG.Enabled = true
-
 LBL.Name = "LBL"
 LBL.Parent = LBLG
 LBL.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -24,16 +24,13 @@ LBL.TextSize = 3
 LBL.TextWrapped = true
 LBL.Visible = true
 
--- 修正2：确保newLBLG正确创建
-local newLBLG = Instance.new("ScreenGui")
+local newLBLG = Instance.new("ScreenGui", game.CoreGui)
 newLBLG.Name = "NewLBLG"
-newLBLG.Parent = game.CoreGui
 newLBLG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 newLBLG.Enabled = true
 
-local newLBL = Instance.new("TextLabel")
+local newLBL = Instance.new("TextLabel", newLBLG)
 newLBL.Name = "NewLBL"
-newLBL.Parent = newLBLG
 newLBL.BackgroundColor3 = Color3.new(1, 1, 1)
 newLBL.BackgroundTransparency = 1
 newLBL.BorderColor3 = Color3.new(0, 0, 0)
@@ -47,7 +44,6 @@ newLBL.TextSize = 14
 newLBL.TextWrapped = true
 newLBL.Visible = true
 
--- 修正3：确保TweenService正常工作
 local TweenService = game:GetService("TweenService")
 local tweenInfo = TweenInfo.new(
     7,
@@ -61,27 +57,23 @@ local goal = {
 local tween = TweenService:Create(newLBL, tweenInfo, goal)
 tween:Play()
 
--- 修正4：保持原始FPS显示逻辑不变
 local FpsLabel = LBL
 local Heartbeat = game:GetService("RunService").Heartbeat
 local LastIteration, Start
 local FrameUpdateTable = { }
 
 local function HeartbeatUpdate()
-    LastIteration = tick()
-    for Index = #FrameUpdateTable, 1, -1 do
-        FrameUpdateTable[Index + 1] = (FrameUpdateTable[Index] >= LastIteration - 1) and FrameUpdateTable[Index] or nil
-    end
-    FrameUpdateTable[1] = LastIteration
-    local CurrentFPS = (tick() - Start >= 1 and #FrameUpdateTable) or (#FrameUpdateTable / (tick() - Start))
-    CurrentFPS = CurrentFPS - CurrentFPS % 1
-    FpsLabel.Text = ("北京时间"..os.date("%H").."时"..os.date("%M").."分"..os.date("%S"))
+	LastIteration = tick()
+	for Index = #FrameUpdateTable, 1, -1 do
+		FrameUpdateTable[Index + 1] = (FrameUpdateTable[Index] >= LastIteration - 1) and FrameUpdateTable[Index] or nil
+	end
+	FrameUpdateTable[1] = LastIteration
+	local CurrentFPS = (tick() - Start >= 1 and #FrameUpdateTable) or (#FrameUpdateTable / (tick() - Start))
+	CurrentFPS = CurrentFPS - CurrentFPS % 1
+	FpsLabel.Text = ("北京时间"..os.date("%H").."时"..os.date("%M").."分"..os.date("%S"))
 end
 Start = tick()
 Heartbeat:Connect(HeartbeatUpdate)
-
--- 修正5：保持原始通知和声音逻辑
-local CoreGui = game:GetService("StarterGui")
 local SoundService = game:GetService("SoundService")
 
 CoreGui:SetCore("SendNotification", {
@@ -121,7 +113,7 @@ sound3.SoundId = "rbxassetid://6436188054"
 sound3.Parent = SoundService
 sound3:Play()
 
--- 修正6：保持原始OrionLib实现
+
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/HyScriptXlite/HydrogenUI/refs/heads/main/ScriptUI')))()
 local Window = OrionLib:MakeWindow({Name = "Xenon Hydrogen", HidePremium = false, SaveConfig = true,IntroText = "“Xenon Hydrogen”", ConfigFolder = "“-”"})
 local about = Window:MakeTab({
@@ -140,14 +132,14 @@ local Tab = Window:MakeTab({
 })
 
 local Section = Tab:AddSection({
-    Name = "群"
+	Name = "群"
 })
 
 Tab:AddButton({
-    Name = "复制群号",
-    Callback = function()
-        setclipboard("893478881")
-    end
+	Name = "复制群号",
+	Callback = function()
+     setclipboard("893478881")
+  	end
 })
 
 local Tab = Window:MakeTab({
@@ -409,6 +401,7 @@ Tab:AddButton({
     game.Players.LocalPlayer.Character:MoveTo(Vector3.new(2711, 23, 12880))
 end
 })
+
 local Section = Tab:AddSection({
 	Name = "极速传奇---球体功能"
 })
