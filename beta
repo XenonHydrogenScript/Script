@@ -1,0 +1,1194 @@
+local LBLG = Instance.new("ScreenGui")
+local LBL = Instance.new("TextLabel")
+local Workspace = game:GetService("Workspace")
+local player = game.Players.LocalPlayer
+
+-- 修正1：确保正确的parent设置
+LBLG.Name = "LBLG"
+LBLG.Parent = game.CoreGui
+LBLG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+LBLG.Enabled = true
+
+LBL.Name = "LBL"
+LBL.Parent = LBLG
+LBL.BackgroundColor3 = Color3.new(1, 1, 1)
+LBL.BackgroundTransparency = 0.5
+LBL.BorderColor3 = Color3.new(0, 0, 0)
+LBL.Position = UDim2.new(0.75, 0, 0.010, 0)
+LBL.Size = UDim2.new(0, 118, 0, 30)
+LBL.Font = Enum.Font.GothamSemibold
+LBL.Text = "TextLabel"
+LBL.TextColor3 = Color3.new(1, 0.8, 0.8)
+LBL.TextScaled = true
+LBL.TextSize = 3
+LBL.TextWrapped = true
+LBL.Visible = true
+
+-- 修正2：确保newLBLG正确创建
+local newLBLG = Instance.new("ScreenGui")
+newLBLG.Name = "NewLBLG"
+newLBLG.Parent = game.CoreGui
+newLBLG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+newLBLG.Enabled = true
+
+local newLBL = Instance.new("TextLabel")
+newLBL.Name = "NewLBL"
+newLBL.Parent = newLBLG
+newLBL.BackgroundColor3 = Color3.new(1, 1, 1)
+newLBL.BackgroundTransparency = 1
+newLBL.BorderColor3 = Color3.new(0, 0, 0)
+newLBL.Position = UDim2.new(0.5, 0, 0.9, -30)
+newLBL.Size = UDim2.new(0, 150, 0, 30)
+newLBL.Font = Enum.Font.GothamSemibold
+newLBL.Text = "Load Code..."
+newLBL.TextColor3 = Color3.new(1, 1, 1)
+newLBL.TextScaled = true
+newLBL.TextSize = 14
+newLBL.TextWrapped = true
+newLBL.Visible = true
+
+-- 修正3：确保TweenService正常工作
+local TweenService = game:GetService("TweenService")
+local tweenInfo = TweenInfo.new(
+    7,
+    Enum.EasingStyle.Linear,
+    Enum.EasingDirection.Out
+)
+local goal = {
+    TextColor3 = Color3.new(1, 1, 1),
+    TextTransparency = 1
+}
+local tween = TweenService:Create(newLBL, tweenInfo, goal)
+tween:Play()
+
+-- 修正4：保持原始FPS显示逻辑不变
+local FpsLabel = LBL
+local Heartbeat = game:GetService("RunService").Heartbeat
+local LastIteration, Start
+local FrameUpdateTable = { }
+
+local function HeartbeatUpdate()
+    LastIteration = tick()
+    for Index = #FrameUpdateTable, 1, -1 do
+        FrameUpdateTable[Index + 1] = (FrameUpdateTable[Index] >= LastIteration - 1) and FrameUpdateTable[Index] or nil
+    end
+    FrameUpdateTable[1] = LastIteration
+    local CurrentFPS = (tick() - Start >= 1 and #FrameUpdateTable) or (#FrameUpdateTable / (tick() - Start))
+    CurrentFPS = CurrentFPS - CurrentFPS % 1
+    FpsLabel.Text = ("北京时间"..os.date("%H").."时"..os.date("%M").."分"..os.date("%S"))
+end
+Start = tick()
+Heartbeat:Connect(HeartbeatUpdate)
+
+-- 修正5：保持原始通知和声音逻辑
+local CoreGui = game:GetService("StarterGui")
+local SoundService = game:GetService("SoundService")
+
+CoreGui:SetCore("SendNotification", {
+    Title = "Xenon Hydrogen",
+    Text = " Hey",
+    Duration = 5, 
+})
+
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://6436188054"
+sound.Parent = SoundService
+sound:Play()
+
+wait(3)
+
+CoreGui:SetCore("SendNotification", {
+    Title = "Xenon Hydrogen",
+    Text = " Local...",
+    Duration = 5, 
+})
+
+local sound2 = Instance.new("Sound")
+sound2.SoundId = "rbxassetid://6436188054"
+sound2.Parent = SoundService
+sound2:Play()
+
+wait(3)
+
+CoreGui:SetCore("SendNotification", {
+    Title = "Xenon Hydrogen",
+    Text = " 欢迎加入893478881",
+    Duration = 5, 
+})
+
+local sound3 = Instance.new("Sound")
+sound3.SoundId = "rbxassetid://6436188054"
+sound3.Parent = SoundService
+sound3:Play()
+
+-- 修正6：保持原始OrionLib实现
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/HyScriptXlite/HydrogenUI/refs/heads/main/ScriptUI')))()
+local Window = OrionLib:MakeWindow({Name = "Xenon Hydrogen", HidePremium = false, SaveConfig = true,IntroText = "“Xenon Hydrogen”", ConfigFolder = "“-”"})
+local about = Window:MakeTab({
+    Name = "-公告-",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+about:AddParagraph("作者:XeH₂")
+about:AddParagraph("V1.9")
+
+local Tab = Window:MakeTab({
+    Name = "-信息-",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+    Name = "群"
+})
+
+Tab:AddButton({
+    Name = "复制群号",
+    Callback = function()
+        setclipboard("893478881")
+    end
+})
+
+local Tab = Window:MakeTab({
+    Name = "-自身-",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+	Name = "--常用--"
+})
+
+Tab:AddButton({
+	Name = "坐标传送",
+	Callback = function()
+     loadstring(game:HttpGet("https://raw.githubusercontent.com/HyScriptXlite/-/refs/heads/main/zbcs"))()
+  	end    
+})
+
+Tab:AddSlider({
+	Name = "速度",
+	Min = 16,
+	Max = 200,
+	Default = 16,
+	Color = Color3.fromRGB(255,192,203),
+	Increment = 1,
+	ValueName = "数值",
+	Callback = function(Value)
+		game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+	end    
+})
+
+Tab:AddSlider({
+	Name = "跳跃高度设置",
+	Min = 50,
+	Max = 200,
+	Default = 50,
+	Color = Color3.fromRGB(255,192,203),
+	Increment = 1,
+	ValueName = "数值",
+	Callback = function(Value)
+		game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
+	end    
+})
+
+Tab:AddTextbox({
+	Name = "跳跃高度设置",
+	Default = "",
+	TextDisappear = true,
+	Callback = function(Value)
+		game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
+	end
+})
+
+Tab:AddTextbox({
+	Name = "移动速度设置",
+	Default = "",
+	TextDisappear = true,
+	Callback = function(Value)
+		game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+	end
+})
+
+Tab:AddTextbox({
+	Name = "重力设置",
+	Default = "",
+	TextDisappear = true,
+	Callback = function(Value)
+		game.Workspace.Gravity = Value
+	end
+})
+
+Tab:AddTextbox({
+    Name = "焦距设置",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(Value)
+        local num = tonumber(Value)
+        if num then
+            num = math.clamp(num, 0.1, 250)
+            game.Workspace.CurrentCamera.FieldOfView = num
+        end
+    end
+})
+
+Tab:AddToggle({
+	Name = "透视 | 玩家",
+	Default = false,
+	Callback = function()
+	local FillColor = Color3.fromRGB(0, 128, 0)
+local DepthMode = "AlwaysOnTop"
+local FillTransparency = 0.5
+local OutlineColor = Color3.fromRGB(255,255,255)
+local OutlineTransparency = 0
+
+local CoreGui = game:FindService("CoreGui")
+local Players = game:FindService("Players")
+local lp = Players.LocalPlayer
+local connections = {}
+
+local Storage = Instance.new("Folder")
+Storage.Parent = CoreGui
+Storage.Name = "Highlight_Storage"
+
+local function Highlight(plr)
+    local Highlight = Instance.new("Highlight")
+    Highlight.Name = plr.Name
+    Highlight.FillColor = FillColor
+    Highlight.DepthMode = DepthMode
+    Highlight.FillTransparency = FillTransparency
+    Highlight.OutlineColor = OutlineColor
+    Highlight.OutlineTransparency = 0
+    Highlight.Parent = Storage
+    
+    local plrchar = plr.Character
+    if plrchar then
+        Highlight.Adornee = plrchar
+    end
+
+    connections[plr] = plr.CharacterAdded:Connect(function(char)
+        Highlight.Adornee = char
+    end)
+end
+
+Players.PlayerAdded:Connect(Highlight)
+for i,v in next, Players:GetPlayers() do
+    Highlight(v)
+end
+
+Players.PlayerRemoving:Connect(function(plr)
+    local plrname = plr.Name
+    if Storage[plrname] then
+        Storage[plrname]:Destroy()
+    end
+    if connections[plr] then
+        connections[plr]:Disconnect()
+    end
+end)
+  	end
+})
+
+Tab:AddToggle({
+	Name = "夜视",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+		    game.Lighting.Ambient = Color3.new(1, 1, 1)
+		else
+		    game.Lighting.Ambient = Color3.new(0, 0, 0)
+		end
+	end
+})
+
+Tab:AddButton({
+	Name = "阿尔宙斯V3",
+	Callback = function()
+     loadstring(game:HttpGet("https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3"))()
+  	end    
+})
+
+Tab:AddButton({
+	Name = "飞车V2 <汉化于豆沙>",	
+    Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Fish-Script/Flying-car-V2/main/Flying%20car%20V2"))()	
+end
+})
+
+Tab:AddButton({
+	Name = "Backdoor.exe",	
+    Callback = function()
+    loadstring(game: HttpGet(('https://raw.githubusercontent.com/iK4oS/backdoor.exe/master/source.lua'),true))()	
+end
+})
+
+Tab:AddButton({
+	Name = "反挂机",
+	Callback = function()
+		print("Anti Afk On")
+		local vu = game:GetService("VirtualUser")
+		game:GetService("Players").LocalPlayer.Idled:connect(function()
+		   vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+		   wait(1)
+		   vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+		end)
+  	end    
+})
+
+Tab:AddButton({
+      Name = "点击传送工具",
+      Callback = function()
+      mouse = game.Players.LocalPlayer:GetMouse() tool = Instance.new("Tool") tool.RequiresHandle = false tool.Name = "点击传送" tool.Activated:connect(function() local pos = mouse.Hit+Vector3.new(0,2.5,0) pos = CFrame.new(pos.X,pos.Y,pos.Z) game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = pos end) tool.Parent = game.Players.LocalPlayer.Backpack
+      end
+})
+
+Tab:AddButton({
+	Name = "工具挂",
+	Callback = function()
+     loadstring(game:HttpGet("https://raw.githubusercontent.com/Bebo-Mods/BeboScripts/main/StandAwekening.lua"))()
+  	end    
+})
+Tab:AddButton({
+	Name = "无限连跳",
+	Callback = function()
+     loadstring(game:HttpGet("https://pastebin.com/raw/V5PQy3y0", true))()
+  	end    
+})
+Tab:AddButton({
+	Name = "FE指令菜单",
+	Callback = function()
+     loadstring(game:HttpGet(('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'),true))()
+  	end    
+})
+Tab:AddButton({
+	Name = "Spy工具",
+	Callback = function()
+     getgenv().Spy="汉化Spy" loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/spy%E6%B1%89%E5%8C%96%20(1).txt"))()
+  	end    
+})
+Tab:AddButton({
+	Name = "DarkDex V3",
+	Callback = function()
+     loadstring(game:HttpGet("https://raw.githubusercontent.com/IlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIl/Script/main/Tools/DarkDexV3.lua", true))()
+  	end    
+})
+local Tab = Window:MakeTab({
+    Name = "-游戏-",
+    Icon = "rbxassetid://7734068321",
+    PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+	Name = "凹凸世界"
+})
+Tab:AddButton({
+    Name = "自动收集能量球",
+    Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/KissxTay/caramelldansen/main/chinese%20event", true))()
+   end
+})
+
+local Section = Tab:AddSection({
+	Name = "极速传奇---TP功能"
+})
+Tab:AddButton({
+    Name = "Jungle洞穴-(新地图)",
+    Callback = function()
+    game.Players.LocalPlayer.Character:MoveTo(Vector3.new(-15260, 240, 3783))
+end
+})
+Tab:AddButton({
+    Name = "Omega Crystal-(欧米茄水晶)",
+    Callback = function()
+    game.Players.LocalPlayer.Character:MoveTo(Vector3.new(4530.78, 75.31, 6405.20))
+end
+})
+Tab:AddButton({
+    Name = "Jungle Crystal-(新水晶)",
+    Callback = function()
+    game.Players.LocalPlayer.Character:MoveTo(Vector3.new(2711, 23, 12880))
+end
+})
+local Section = Tab:AddSection({
+	Name = "极速传奇---球体功能"
+})
+Tab:AddButton({
+    Name = "循环红色球",
+    Callback = function()
+        local args = {
+            [1] = "collectOrb",
+            [2] = "Red Orb",
+            [3] = "City"
+        }
+        local replicatedStorage = game:GetService("ReplicatedStorage")
+        local orbEvent = replicatedStorage.rEvents.orbEvent
+        local success, err = pcall(function()
+            while true do
+                orbEvent:FireServer(unpack(args))
+                task.wait(0.3)
+            end
+        end)
+        if not success then
+            warn("Error:", err)
+        end
+    end
+})
+Tab:AddButton({
+    Name = "循环蓝色球",
+    Callback = function()
+        local args = {
+            [1] = "collectOrb",
+            [2] = "Blue Orb",
+            [3] = "City"
+        }
+        local replicatedStorage = game:GetService("ReplicatedStorage")
+        local orbEvent = replicatedStorage.rEvents.orbEvent
+        local success, err = pcall(function()
+            while true do
+                orbEvent:FireServer(unpack(args))
+                task.wait(0.3)
+            end
+        end)
+        if not success then
+            warn("Error:", err)
+        end
+    end
+})
+Tab:AddButton({
+    Name = "循环橙色球",
+    Callback = function()
+        local args = {
+            [1] = "collectOrb",
+            [2] = "Orange Orb",
+            [3] = "City"
+        }
+        local replicatedStorage = game:GetService("ReplicatedStorage")
+        local orbEvent = replicatedStorage.rEvents.orbEvent
+        local success, err = pcall(function()
+            while true do
+                orbEvent:FireServer(unpack(args))
+                task.wait(0.3)
+            end
+        end)
+        if not success then
+            warn("Error:", err)
+        end
+    end
+})
+Tab:AddButton({
+    Name = "循环黄色球",
+    Callback = function()
+        local args = {
+            [1] = "collectOrb",
+            [2] = "Yellow Orb",
+            [3] = "City"
+        }
+        local replicatedStorage = game:GetService("ReplicatedStorage")
+        local orbEvent = replicatedStorage.rEvents.orbEvent
+        local success, err = pcall(function()
+            while true do
+                orbEvent:FireServer(unpack(args))
+                task.wait(0.3)
+            end
+        end)
+        if not success then
+            warn("Error:", err)
+        end
+    end
+})
+Tab:AddButton({
+    Name = "循环钻石",
+    Callback = function()
+        local args = {
+            [1] = "collectOrb",
+            [2] = "Gem",
+            [3] = "Legends Highway"
+        }
+        local replicatedStorage = game:GetService("ReplicatedStorage")
+        local orbEvent = replicatedStorage.rEvents.orbEvent
+        local success, err = pcall(function()
+            while true do
+                orbEvent:FireServer(unpack(args))
+                task.wait(0.3)
+            end
+        end)
+        if not success then
+            warn("Error:", err)
+        end
+    end
+})
+
+local Section = Tab:AddSection({
+	Name = "Doors"
+})
+Tab:AddButton({
+    Name = "调整模式",
+    Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/jdjdhdhjd/Doors/refs/heads/main/Doors"))()
+   end
+})
+Tab:AddButton({
+    Name = "BlackKing{Q群附教程}",
+    Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/KINGHUB01/BlackKing-obf/main/Doors%20Blackking%20And%20BobHub"))()
+   end
+})
+Tab:AddButton({
+    Name = "绕过速度检测",
+    Callback = function()
+    _G.AntiCheatBypass = true
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/KINGHUB01/BlackKing-obf/main/Door%20Bypass%20Anti%20Cheat"))()
+   end
+})
+Tab:AddToggle({
+	Name = "瞬间互动",
+	Default = false,
+    Flag = "InstantToggle",
+    Save = true
+})
+Tab:AddToggle({
+	Name = "追逐战去除火焰",
+	Default = false,
+    Flag = "NoSeek",
+    Save = true
+})
+
+local Section = Tab:AddSection({
+	Name = "Fisch"
+})
+Tab:AddButton({
+    Name = "乌托邦",
+    Callback = function()
+    loadstring(game:HttpGet("https://pastefy.app/M1Ns2Ggo/raw"))()
+   end
+})
+Tab:AddButton({
+    Name = "X",
+    Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+   end
+})
+
+local Section = Tab:AddSection({
+	Name = "Fisch---TP脚本"
+})
+Tab:AddButton({
+    Name = "TP脚本(不覆盖)",
+    Callback = function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/HyScriptXlite/TP-FX/refs/heads/main/FX'))()
+end
+})
+
+local Section = Tab:AddSection({
+	Name = "最强的战场"
+})
+Tab:AddButton({
+	Name = "自动躲避",
+	Callback = function()
+    shared.BlockOrCounterKeycode = Enum.KeyCode.Four
+shared.Range = 6
+
+print("loaded")
+if shared.DebugConnections ~= nil then
+    for i,v in pairs(shared.DebugConnections) do
+        v:Disconnect()
+        v = nil
+    end
+end
+
+-- services
+local RunService = game:GetService("RunService")
+local players = game:GetService("Players")
+
+-- vars
+local player = game.Players.LocalPlayer
+
+-- tables
+local validTargets = {}
+-- "UsedDash"
+local ignoreAccessories = {"FinalDeath","Ragdoll","RagdollSim","Small Debris","Freeze"}
+
+-- functions
+function stringstarts(String,Start)
+    return string.sub(String,1,string.len(Start))==Start
+end
+
+-- keypress functions
+local vim = game:GetService('VirtualInputManager')
+input = {
+    hold = function(key, time)
+        vim:SendKeyEvent(true, key, false, nil)
+        task.wait(time)
+        vim:SendKeyEvent(false, key, false, nil)
+    end,
+    press = function(key)
+        vim:SendKeyEvent(true, key, false, nil)
+	task.wait(0.005)
+        vim:SendKeyEvent(false, key, false, nil)
+    end
+}
+
+shared.DebugConnections = {}
+
+local debounce = false
+shared.DebugConnections["RunService"] = RunService.RenderStepped:Connect(function()
+    for i,v in pairs(players:GetPlayers()) do
+        if v ~= player then
+            local pos,playerPos
+            if not v.Character or not player.Character then return end
+
+            if v.Character:FindFirstChild("HumanoidRootPart") then 
+                pos = v.Character.HumanoidRootPart.Position
+            else
+                pos = v.Character:GetPivot().Position
+            end
+
+            if player.Character:FindFirstChild("HumanoidRootPart") then
+                playerPos = player.Character.HumanoidRootPart.Position
+            else
+                playerPos = player.Character:GetPivot().Position
+            end
+            if (pos - playerPos).Magnitude <= (shared.Range or 6) then
+                if not table.find(validTargets,v) then
+                    validTargets[#validTargets + 1] = v
+                    
+                    local connections = {}
+                    connections["LeavePlayer"] = v.CharacterRemoving:Connect(function()
+                        table.remove(validTargets,table.find(validTargets,v))
+
+                        for i,connect in pairs(connections) do
+                            if shared.DebugConnections[v.Name..i] then
+                                shared.DebugConnections[v.Name..i]:Disconnect()
+                                shared.DebugConnections[v.Name..i] = nil
+                            end
+
+                            if connect then
+                                connect:Disconnect()
+                                connect = nil
+                            end
+                        end
+                    end)
+
+                    connections["LeaveRange"] = RunService.Heartbeat:Connect(function()
+                        local pos = v.Character.HumanoidRootPart.Position or v.Character:GetPivot().Position
+                        if (pos - players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > (shared.Range or 6) then
+                            print("leaving range "..v.Name)
+                            table.remove(validTargets,table.find(validTargets,v))
+                            for i,connect in pairs(connections) do
+                                if shared.DebugConnections[v.Name..i] then
+                                    shared.DebugConnections[v.Name..i]:Disconnect()
+                                    shared.DebugConnections[v.Name..i] = nil
+                                end
+
+                                if connect then
+                                    connect:Disconnect()
+                                    connect = nil
+                                end
+                            end
+                        end
+                    end)
+
+                    connections["newAbilityUsed"] = v.Character.ChildAdded:Connect(function(child)
+                        print("new ability used")
+                        if not child:IsA("Accessory") then return end
+                        print("real1")
+                        for a,b in pairs(ignoreAccessories) do if child.Name:lower():match(b:lower()) then return end end
+                        print("real2")
+                        if stringstarts(child.Name,"#ACCESSORY") or child.Name:lower():match("counter") then return end
+                        print("real3")
+
+                        if not debounce then
+                            debounce = true
+                            print(child.Name.." and path: "..child:GetFullName())
+                            input.hold(shared.BlockOrCounterKeycode or Enum.KeyCode.Four,0.15)
+                            debounce = false
+                        end
+                    end)
+
+                    for i,connect in pairs(connections) do
+                        shared.DebugConnections[v.Name..i] = connect
+                    end
+                end
+            end
+        end
+    end
+end)
+
+shared.DebugConnections["PlayerLeave"] = players.PlayerDisconnecting:Connect(function(player)
+    if table.find(validTargets,player) then
+        table.remove(validTargets,table.find(validTargets,player))
+    end
+end)
+
+shared.DebugConnections["HumanoidDied"] = player.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+    for i,v in pairs(validTargets) do
+        table.remove(validTargets,i)
+    end
+end)
+
+shared.DebugConnections["PlayerRespawn"] = player.CharacterAdded:Connect(function(char)
+    for i,v in pairs(validTargets) do
+        table.remove(validTargets,i)
+    end
+    
+    task.spawn(function()
+        char:WaitForChild("Humanoid",math.huge)
+
+        shared.DebugConnections["HumanoidDied"]:Disconnect()
+        shared.DebugConnections["HumanoidDied"] = player.Character:FindFirstChildOfClass("Humanoid").Died:Connect(function()
+            for i,v in pairs(validTargets) do
+                table.remove(validTargets,i)
+            end
+
+            for i,v in pairs(shared.DebugConnections) do
+                if i:match("newAbilityUsed") or i:match("LeaveRange") or i:match("LeavePlayer") then
+                    v:Disconnect()
+                    v = nil
+                end
+            end
+        end)
+    end) 
+end)
+
+end
+})
+local Section = Tab:AddSection({
+	Name = "忍者传奇---售卖类"
+})
+autoswing = false
+function swinging()
+    spawn(
+        function()
+            while autoswing == true do
+                task.wait()
+                game:GetService("Players").LocalPlayer.ninjaEvent:FireServer("swingKatana")
+                if not autoswing then
+                    break
+                end
+            end
+        end
+    )
+end
+autosell = false
+function selling()
+    spawn(
+        function()
+            while autosell == true do
+                task.wait(.01)
+                if game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart") then
+                    game.workspace.sellAreaCircles["sellAreaCircle7"].circleInner.CFrame =
+                        game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame
+                    wait(.1)
+                    game.workspace.sellAreaCircles["sellAreaCircle7"].circleInner.CFrame =
+                        game.Workspace.Part.CFrame
+                    if not autosell then
+                        break
+                    end
+                end
+            end
+        end
+    )
+end
+autosellmax = false
+function maxsell()
+    spawn(
+        function()
+            while autosellmax == true do
+                task.wait()
+                if game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart") then
+                    if game.Players.LocalPlayer.PlayerGui.gameGui.maxNinjitsuMenu.Visible == true then
+                        game.workspace.sellAreaCircles["sellAreaCircle7"].circleInner.CFrame =
+                            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame
+                        task.wait()
+                        game.workspace.sellAreaCircles["sellAreaCircle7"].circleInner.CFrame =
+                            game.Workspace.Part.CFrame
+                    end
+                end
+                if not autosellmax then
+                    break
+                end
+            end
+        end
+    )
+end
+autobuyswords = false
+function buyswords()
+    spawn(
+        function()
+            while autobuyswords == true do
+                task.wait()
+                if game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart") then
+                    local oh1 = "buyAllSwords"
+                    local oh2 = {
+                        "Ground",
+                        "Astral Island",
+                        "Space Island",
+                        "Tundra Island",
+                        "Eternal Island",
+                        "Sandstorm",
+                        "Thunderstorm",
+                        "Ancient Inferno Island",
+                        "Midnight Shadow Island",
+                        "Mythical Souls Island",
+                        "Winter Wonder Island"
+                    }
+                    for i = 1, #oh2 do
+                        game:GetService("Players").LocalPlayer.ninjaEvent:FireServer(oh1, oh2[i])
+                    end
+                end
+                if not autobuyswords then
+                    break
+                end
+            end
+        end
+    )
+end
+autobuybelts = false
+function buybelts()
+    spawn(
+        function()
+            while autobuybelts == true do
+                task.wait()
+                if game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart") then
+                    local oh1 = "buyAllBelts"
+                    local oh2 = {
+                        "Ground",
+                        "Astral Island",
+                        "Space Island",
+                        "Tundra Island",
+                        "Eternal Island",
+                        "Sandstorm",
+                        "Thunderstorm",
+                        "Ancient Inferno Island",
+                        "Midnight Shadow Island",
+                        "Mythical Souls Island",
+                        "Winter Wonder Island"
+                    }
+                    for i = 1, #oh2 do
+                        game:GetService("Players").LocalPlayer.ninjaEvent:FireServer(oh1, oh2[i])
+                    end
+                end
+                if not autobuybelts then
+                    break
+                end
+            end
+        end
+    )
+end
+autobuyranks = false
+function buyranks()
+    spawn(
+        function()
+            while autobuyranks == true do
+                task.wait()
+                if game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart") then
+                    local oh1 = "buyRank"
+                    local oh2 = game:GetService("ReplicatedStorage").Ranks.Ground:GetChildren()
+                    for i = 1, #oh2 do
+                        game:GetService("Players").LocalPlayer.ninjaEvent:FireServer(oh1, oh2[i].Name)
+                    end
+                end
+                if not autobuyranks then
+                    break
+                end
+            end
+        end
+    )
+end
+autobuyskill = false
+function buyskill()
+    spawn(
+        function()
+            while autobuyskill == true do
+                task.wait()
+                if game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart") then
+                    local oh1 = "buyAllSkills"
+                    local oh2 = {
+                        "Ground",
+                        "Astral Island",
+                        "Space Island",
+                        "Tundra Island",
+                        "Eternal Island",
+                        "Sandstorm",
+                        "Thunderstorm",
+                        "Ancient Inferno Island",
+                        "Midnight Shadow Island",
+                        "Mythical Souls Island",
+                        "Winter Wonder Island"
+                    }
+                    for i = 1, #oh2 do
+                        game:GetService("Players").LocalPlayer.ninjaEvent:FireServer(oh1, oh2[i])
+                    end
+                end
+                if not autobuyskill then
+                    break
+                end
+            end
+        end
+    )
+end
+autobuyshurikens = false
+function buyshurikens()
+    spawn(
+        function()
+            while autobuyshurikens == true do
+                task.wait()
+                if game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart") then
+                    local oh1 = "buyAllShurikens"
+                    local oh2 = {
+                        "Ground",
+                        "Astral Island",
+                        "Space Island",
+                        "Tundra Island",
+                        "Eternal Island",
+                        "Sandstorm",
+                        "Thunderstorm",
+                        "Ancient Inferno Island",
+                        "Midnight Shadow Island",
+                        "Mythical Souls Island",
+                        "Winter Wonder Island"
+                    }
+                    for i = 1, #oh2 do
+                        game:GetService("Players").LocalPlayer.ninjaEvent:FireServer(oh1, oh2[i])
+                    end
+                end
+                if not autobuyshurikens then
+                    break
+                end
+            end
+        end
+    )
+end
+
+Tab:AddToggle(
+    {
+        Name = "自动挥舞",
+        Default = false,
+        Callback = function(x)
+            autoswing = x
+            if autoswing then
+                swinging()
+            end
+        end
+    }
+)
+
+Tab:AddToggle(
+    {
+        Name = "自动售卖",
+        Default = false,
+        Callback = function(x)
+            autosell = x
+            if autosell then
+                selling()
+            end
+        end
+    }
+)
+    
+Tab:AddToggle(
+    {
+        Name = "存满自动售卖",
+        Default = false,
+        Callback = function(x)
+            autosellmax = x
+            if autosellmax then
+                maxsell()
+            end
+        end
+    }
+)
+local Section = Tab:AddSection({
+	Name = "忍者传奇---购买类"
+})
+Tab:AddToggle(
+    {
+        Name = "自动购买剑",
+        Default = false,
+        Callback = function(x)
+            autobuyswords = x
+            if autobuyswords then
+                buyswords()
+            end
+        end
+    }
+)
+
+Tab:AddToggle(
+    {
+        Name = "自动购买腰带",
+        Default = false,
+        Callback = function(x)
+            autobuybelts = x
+            if autobuybelts then
+                buybelts()
+            end
+        end
+    }
+)
+
+Tab:AddToggle(
+    {
+        Name = "自动购买称号",
+        Default = false,
+        Callback = function(x)
+            autobuyranks = x
+            if autobuyranks then
+                buyranks()
+            end
+        end
+    }
+)
+
+Tab:AddToggle(
+    {
+        Name = "自动购买忍术",
+        Default = false,
+        Callback = function(x)
+            autobuyskill = x
+            if autobuyskill then
+                buyskill()
+            end
+        end
+    }
+)
+
+Tab:AddToggle(
+    {
+        Name = "自动购买",
+        Default = false,
+        Callback = function(x)
+            autobuyshurikens = x
+            if autobuyshurikens then
+                buyshurikens()
+            end
+        end
+    }
+)
+
+Tab:AddButton(
+    {
+        Name = "解锁岛屿",
+        Callback = function()
+            for _, v in next, game.workspace.islandUnlockParts:GetChildren() do
+                if v then
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.islandSignPart.CFrame
+                    wait(.5)
+                end
+            end
+        end
+    }
+)
+local Section = Tab:AddSection({
+	Name = "忍者传奇---主要功能"
+})
+Tab:AddButton({
+	Name = "调整连跳上限50",
+	Callback = function()
+    game:GetService("Players").LocalPlayer.multiJumpCount.Value = "50"
+  	end    
+})
+
+local Section = Tab:AddSection({
+	Name = "力量传奇---TP功能"
+})
+Tab:AddButton({
+	Name = "传送到出生点",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(7,3,108)
+  	end    
+})
+
+Tab:AddButton({
+	Name = "传送到冰霜健身房",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-2543,13,-410)
+  	end    
+})
+
+Tab:AddButton({
+	Name = "传送到神话健身房",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(2177,13,1070)
+  	end    
+})
+
+Tab:AddButton({
+	Name = "传送到永恒健身房",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-6686,13,-1284)
+  	end    
+})
+
+Tab:AddButton({
+	Name = "传送到传说健身房",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(4676,997,-3915)
+  	end    
+})
+
+Tab:AddButton({
+	Name = "传送到肌肉之王健身房",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-8554,22,-5642)
+  	end    
+})
+
+Tab:AddButton({
+	Name = "传送到安全岛",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-39,10,1838)
+  	end    
+})
+
+local Tab = Window:MakeTab({
+    Name = "-测试专区-",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+	Name = "黑暗欺骗"
+})
+Tab:AddButton({
+	Name = "拾取光环",
+	Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonHydrogenScript/Script/refs/heads/main/Pick%20Aura"))()
+})
+
+
+--//Script :
+
+--//INSTANT TOGGLE
+game:GetService("ProximityPromptService").PromptButtonHoldBegan:Connect(function(prompt)
+    if OrionLib.Flags["InstantToggle"].Value == true then
+        fireproximityprompt(prompt)
+    end
+end)
+
+local old
+old = hookmetamethod(game,"__namecall",newcclosure(function(self,...)
+    local args = {...}
+    local method = getnamecallmethod()
+    
+    if tostring(self) == 'Screech' and method == "FireServer" and OrionLib.Flags["ScreechToggle"].Value == true then
+        args[1] = true
+        return old(self,unpack(args))
+    end
+    if tostring(self) == 'ClutchHeartbeat' and method == "FireServer" and OrionLib.Flags["HeartbeatWin"].Value == true then
+        args[2] = true
+        return old(self,unpack(args))
+    end
+    
+    return old(self,...)
+end))
+
+--//NO SEEK
+game:GetService("Workspace").CurrentRooms.DescendantAdded:Connect(function(descendant)
+    if OrionLib.Flags["NoSeek"].Value == true and descendant.Name == ("Seek_Arm" or "ChandelierObstruction") then
+        task.spawn(function()
+            wait()
+            descendant:Destroy()
+        end)
+    end
+end)
