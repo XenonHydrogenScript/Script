@@ -2,7 +2,6 @@ local LBLG = Instance.new("ScreenGui", getParent)
 local LBL = Instance.new("TextLabel", getParent)
 local Workspace = game:GetService("Workspace")
 local player = game.Players.LocalPlayer
-local getParent = game.CoreGui
 
 LBLG.Name = "LBLG"
 LBLG.Parent = game.CoreGui
@@ -226,6 +225,62 @@ Tab:AddTextbox({
 })
 
 Tab:AddToggle({
+	Name = "透视 | 玩家",
+	Default = false,
+	Callback = function()
+	local FillColor = Color3.fromRGB(0, 128, 0)
+local DepthMode = "AlwaysOnTop"
+local FillTransparency = 0.5
+local OutlineColor = Color3.fromRGB(255,255,255)
+local OutlineTransparency = 0
+
+local CoreGui = game:FindService("CoreGui")
+local Players = game:FindService("Players")
+local lp = Players.LocalPlayer
+local connections = {}
+
+local Storage = Instance.new("Folder")
+Storage.Parent = CoreGui
+Storage.Name = "Highlight_Storage"
+
+local function Highlight(plr)
+    local Highlight = Instance.new("Highlight")
+    Highlight.Name = plr.Name
+    Highlight.FillColor = FillColor
+    Highlight.DepthMode = DepthMode
+    Highlight.FillTransparency = FillTransparency
+    Highlight.OutlineColor = OutlineColor
+    Highlight.OutlineTransparency = 0
+    Highlight.Parent = Storage
+    
+    local plrchar = plr.Character
+    if plrchar then
+        Highlight.Adornee = plrchar
+    end
+
+    connections[plr] = plr.CharacterAdded:Connect(function(char)
+        Highlight.Adornee = char
+    end)
+end
+
+Players.PlayerAdded:Connect(Highlight)
+for i,v in next, Players:GetPlayers() do
+    Highlight(v)
+end
+
+Players.PlayerRemoving:Connect(function(plr)
+    local plrname = plr.Name
+    if Storage[plrname] then
+        Storage[plrname]:Destroy()
+    end
+    if connections[plr] then
+        connections[plr]:Disconnect()
+    end
+end)
+  	end
+})
+
+Tab:AddToggle({
 	Name = "夜视",
 	Default = false,
 	Callback = function(Value)
@@ -236,6 +291,18 @@ Tab:AddToggle({
 		end
 	end
 })
+
+Tab:AddToggle({
+	Name = "去除雾气",
+	Default = false,
+	Callback = function(state)
+		if state then
+        game.Lighting.FogStart = 3276634343
+        game.Lighting.FogEnd = 3276734343
+    else
+        game.Lighting.FogStart = 0
+    end
+end)}
 
 Tab:AddButton({
 	Name = "阿尔宙斯V3",
@@ -345,7 +412,6 @@ Tab:AddButton({
     game.Players.LocalPlayer.Character:MoveTo(Vector3.new(2711, 23, 12880))
 end
 })
-
 local Section = Tab:AddSection({
 	Name = "极速传奇---球体功能"
 })
@@ -468,6 +534,13 @@ Tab:AddButton({
     Name = "BlackKing{Q群附教程}",
     Callback = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/KINGHUB01/BlackKing-obf/main/Doors%20Blackking%20And%20BobHub"))()
+   end
+})
+Tab:AddButton({
+    Name = "绕过速度检测",
+    Callback = function()
+    _G.AntiCheatBypass = true
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/KINGHUB01/BlackKing-obf/main/Door%20Bypass%20Anti%20Cheat"))()
    end
 })
 Tab:AddToggle({
@@ -1068,6 +1141,80 @@ Tab:AddButton({
 	Name = "传送到安全岛",
 	Callback = function()
     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-39,10,1838)
+  	end    
+})
+
+local Section = Tab:AddSection({
+    Name = "间歇(Alpha)---速通功能"
+})
+Tab:AddButton({
+	Name = "传送逃生门[第一关]",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(3,4,-157)
+  	end    
+})
+Tab:AddButton({
+	Name = "传送逃生门[第二关]",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-151,3,673)
+  	end    
+})
+Tab:AddButton({
+    Name = "删除逃生门[第三关]",
+    Callback = function()
+        local workspace = game:GetService("Workspace")
+        print("ExitGate")
+        local gate = workspace:FindFirstChild("ExitGate")
+        if gate then
+            print("ExitGate")
+            gate:Destroy()
+        else
+            print("ExitGate")
+        end
+    end
+})
+Tab:AddButton({
+	Name = "传送逃生门[第四关]",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(336,5,-80)
+  	end    
+})
+Tab:AddButton({
+	Name = "传送逃生门[第五关]",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(57,3,-49)
+  	end    
+})
+Tab:AddButton({
+	Name = "传送逃生门[第六关]",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(287,5,-58)
+  	end    
+})
+Tab:AddButton({
+    Name = "删除逃生门[第七关]--2",
+    Callback = function()
+        local workspace = game:GetService("Workspace")
+        print("ExitDoor")
+        local door = workspace:FindFirstChild("ExitDoor")
+        if door then
+            print("ExitDoor")
+            door:Destroy()
+        else
+            print("ExitDoor")
+        end
+    end
+})
+Tab:AddButton({
+	Name = "传送逃生门[第七关]--1",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(363,6,10)
+  	end    
+})
+Tab:AddButton({
+	Name = "传送逃生门[第八关]",
+	Callback = function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(31,5,493)
   	end    
 })
 
