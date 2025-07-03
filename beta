@@ -1218,21 +1218,6 @@ Tab:AddButton({
   	end    
 })
 
-local Tab = Window:MakeTab({
-    Name = "-测试专区-",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local Section = Tab:AddSection({
-	Name = "黑暗欺骗"
-})
-Tab:AddButton({
-	Name = "拾取光环",
-	Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonHydrogenScript/Script/refs/heads/main/Pick%20Aura"))()
-})
-
 
 --//Script :
 
