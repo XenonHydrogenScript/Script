@@ -1,10 +1,9 @@
-local LBLG = Instance.new("ScreenGui", getParent)
-local LBL = Instance.new("TextLabel", getParent)
-local Workspace = game:GetService("Workspace")
-local player = game.Players.LocalPlayer
-
-LBLG.Name = "LBLG"
-LBLG.Parent = game.CoreGui
+local LBLG = Instance.new("ScreenGui")
+ local LBL = Instance.new("TextLabel", getParent)
+ local Workspace = game:GetService("Workspace")
+ local player = game.Players.LocalPlayer
+ LBLG.Name = "LBLG"
+ LBLG.Parent = game.CoreGui
 LBLG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 LBLG.Enabled = true
 LBL.Name = "LBL"
@@ -44,14 +43,14 @@ newLBL.Visible = true
 
 local TweenService = game:GetService("TweenService")
 local tweenInfo = TweenInfo.new(
-    7,
-    Enum.EasingStyle.Linear,
-    Enum.EasingDirection.Out
-)
+     7,
+     Enum.EasingStyle.Linear,
+     Enum.EasingDirection.Out
+ )
 local goal = {
-    TextColor3 = Color3.new(1, 1, 1),
-    TextTransparency = 1
-}
+     TextColor3 = Color3.new(1, 1, 1),
+     TextTransparency = 1
+ }
 local tween = TweenService:Create(newLBL, tweenInfo, goal)
 tween:Play()
 
@@ -229,7 +228,7 @@ Tab:AddToggle({
 	Default = false,
 	Callback = function()
 	local FillColor = Color3.fromRGB(0, 128, 0)
-local DepthMode = "AlwaysOnTop"
+local DepthMode = Enum.DepthMode.AlwaysOnTop
 local FillTransparency = 0.5
 local OutlineColor = Color3.fromRGB(255,255,255)
 local OutlineTransparency = 0
@@ -293,16 +292,17 @@ Tab:AddToggle({
 })
 
 Tab:AddToggle({
-	Name = "去除雾气",
-	Default = false,
-	Callback = function(state)
-		if state then
-        game.Lighting.FogStart = 3276634343
-        game.Lighting.FogEnd = 3276734343
-    else
-        game.Lighting.FogStart = 0
-    end
-end)}
+ 	Name = "去除雾气",
+ 	Default = false,
+ 	Callback = function(state)
+ 		if state then
+             game.Lighting.FogStart = 3276634343
+             game.Lighting.FogEnd = 3276734343
+         else
+             game.Lighting.FogStart = 0
+         end
+ 	end
+ })
 
 Tab:AddButton({
 	Name = "阿尔宙斯V3",
@@ -1228,10 +1228,11 @@ local Section = Tab:AddSection({
 	Name = "黑暗欺骗"
 })
 Tab:AddButton({
-	Name = "拾取光环",
-	Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonHydrogenScript/Script/refs/heads/main/Pick%20Aura"))()
-})
+ 	Name = "拾取光环",
+ 	Callback = function()
+     loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonHydrogenScript/Script/refs/heads/main/Pick%20Aura"))()
+ end
+ })
 
 
 --//Script :
