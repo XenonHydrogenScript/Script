@@ -584,7 +584,7 @@ ts:Button("拾取光环", function()
         while isRunning and teleportCount < 5 do
             local shards = workspace:FindFirstChild("Shards")
             if not shards then
-                task.wait(0.01)
+                task.wait(0.5)
                 continue
             end
 
@@ -597,7 +597,7 @@ ts:Button("拾取光环", function()
                 humanoidRootPart.CFrame = emptyLocation
                 teleportCount = teleportCount + 1
                 print("Shadow:", teleportCount.."/5")
-                task.wait(0.01)
+                task.wait(0.5)
             else
                 teleportCount = 0
 
@@ -623,7 +623,7 @@ ts:Button("拾取光环", function()
     end
 end)
 
-ts:Toggle("跳过追逐", false, function(isEnabled)
+ts:Toggle("跳过追逐[进电梯开启]", false, function(isEnabled)
     local player = game.Players.LocalPlayer
     local running = true
     local checkInterval = 0.3
@@ -648,7 +648,7 @@ ts:Toggle("跳过追逐", false, function(isEnabled)
                             local target = Vector3.new(38, 21, 63)
                             while running and isEnabled and (hrp.Position - target).Magnitude > arrivalThreshold do
                                 humanoid:MoveTo(target)
-                                task.wait(0.1)
+                                task.wait(0.01)
                             end
 
                             humanoid.WalkSpeed = 16
