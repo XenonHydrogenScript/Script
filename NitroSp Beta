@@ -26,7 +26,7 @@ ImageButton.BackgroundColor3 = Color3.fromRGB(5, 6, 7)
 ImageButton.BackgroundTransparency = 0.500 
 ImageButton.Position = UDim2.new(0.0235790554, 0, 0.466334164, 0) 
 ImageButton.Size = UDim2.new(0, 50, 0, 50) 
-ImageButton.Image = "rbxassetid://109251560" 
+ImageButton.Image = "rbxassetid://692827213" 
 ImageButton.Draggable = true 
 
 UICorner.CornerRadius = UDim.new(0, 25)
@@ -57,7 +57,7 @@ CoreGui:SetCore("SendNotification", {
     Duration = 10,
 })
 
-local win = lib:Window("氙氢V9", Color3.fromRGB(0, 255, 0), Enum.KeyCode.E)
+local win = lib:Window("NitroSp V1.9", Color3.fromRGB(0, 255, 0), Enum.KeyCode.E)
 
 local xx = win:Tab("| 信息 |")
 local gn = win:Tab("| 功能 |")
@@ -66,9 +66,6 @@ local ts = win:Tab("| 调试 |")
 
 xx:Label("作者XeH₂")
 xx:Label("服务器ID:" .. game.GameId .. ".")
-xx:Button("关闭脚本",function()
-   game:GetService("CoreGui")["frosty"]:Destroy()
- end)
 
 zs:Label("-----通用-----")
 zs:Button("获取坐标", function()
@@ -486,7 +483,7 @@ task.defer(function()
         end
     end
 end)
-gn:Label("Fisch")
+gn:Label("-----Fisch-----")
 gn:Toggle("自动摇晃", false, function(state)
     if state then
         local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -555,7 +552,7 @@ gn:Toggle("自动摇晃", false, function(state)
     end
 end)
 
-ts:Label("黑暗欺骗")
+ts:Label("-----黑暗欺骗-----")
 ts:Button("拾取光环", function()
     local player = game.Players.LocalPlayer
     local isRunning = true
