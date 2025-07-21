@@ -140,12 +140,12 @@ zs:Button("反挂机", function()
 		end)
     end)
 zs:Toggle("夜视", false, function(value)
-if Value then
-		    game.Lighting.Ambient = Color3.new(1, 1, 1)
-		else
-		    game.Lighting.Ambient = Color3.new(0, 0, 0)
-		end
-	end)
+    if value then
+        game.Lighting.Ambient = Color3.new(1, 1, 1)
+    else
+        game.Lighting.Ambient = Color3.new(0, 0, 0)
+    end
+end)
 zs:Button("阿尔宙斯V3", function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3"))()
 end)
@@ -325,21 +325,26 @@ end))
 gn:Button("Blacking", function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/KINGHUB01/BlackKing-obf/main/Doors%20Blackking%20And%20BobHub"))()
 end)
-gn:Toggle("客户端光亮",'Toggleflag',false,function(bright)
-	applyLight(bright)
+gn:Toggle("客户端光亮", false, function(bright)
+    applyLight(bright)
 end)
-    local function applyLight(value)
+
+local function applyLight(value)
     if value then 
-        local light = Instance.new('PointLight', game.Players.LocalPlayer.Character.Head)
-        light.Name='bright'
-        light.Range = 150
-        light.Brightness = 1.7
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Head") then
+            local light = Instance.new('PointLight', game.Players.LocalPlayer.Character.Head)
+            light.Name='bright'
+            light.Range = 150
+            light.Brightness = 1.7
+        end
     else
         pcall(function()
-            game.Players.LocalPlayerp.Character.Head.bright:remove();
-        end);
-    end;
-end;
+            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Head") then
+                game.Players.LocalPlayer.Character.Head.bright:Destroy()
+            end
+        end)
+    end
+end
 gn:Toggle("钥匙透视", false, function(state)
     keyesp = state
     for _, cham in pairs(KeyChams) do
@@ -482,45 +487,186 @@ task.defer(function()
     end
 end)
 gn:Label("Fisch")
-gn:Toggle("自动摇晃", false, function()
-local VirtualInputManager = game:GetService("VirtualInputManager")
+gn:Toggle("自动摇晃", false, function(state)
+    if state then
+        local VirtualInputManager = game:GetService("VirtualInputManager")
+        local GuiService = game:GetService("GuiService")
+        local player = game.Players.LocalPlayer
+        local gui = player:WaitForChild("PlayerGui")
 
-local function clickButton(button)
-    GuiService.SelectedObject = button
-    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-end
-
-local function setupButtonListener()
-    gui.DescendantAdded:Connect(function(descendant)
-        if descendant.Name == "button" and 
-           descendant.Parent and 
-           descendant.Parent.Name == "safezone" and
-           descendant.Parent.Parent and 
-           descendant.Parent.Parent.Name == "shakeui" then
-            task.spawn(function()
-                while descendant and descendant.Parent do
-                    clickButton(descendant)
-                    task.wait()
-                end
-            end)
+        local function clickButton(button)
+            GuiService.SelectedObject = button
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
         end
-    end)
-    
-    for _, descendant in ipairs(gui:GetDescendants()) do
-        if descendant.Name == "button" and 
-           descendant.Parent and 
-           descendant.Parent.Name == "safezone" and
-           descendant.Parent.Parent and 
-           descendant.Parent.Parent.Name == "shakeui" then
-            task.spawn(function()
-                while descendant and descendant.Parent do
-                    clickButton(descendant)
-                    task.wait()
+
+        -- 存储所有正在运行的循环，以便可以停止它们
+        local runningLoops = {}
+
+        local function stopAllLoops()
+            for _, loop in pairs(runningLoops) do
+                loop:Disconnect()
+            end
+            runningLoops = {}
+        end
+
+        local function setupButtonListener()
+            -- 监听新添加的按钮
+            local connection = gui.DescendantAdded:Connect(function(descendant)
+                if descendant.Name == "button" and 
+                   descendant.Parent and 
+                   descendant.Parent.Name == "safezone" and
+                   descendant.Parent.Parent and 
+                   descendant.Parent.Parent.Name == "shakeui" then
+                    local loop
+                    loop = task.spawn(function()
+                        while descendant and descendant.Parent and state do
+                            clickButton(descendant)
+                            task.wait()
+                        end
+                    end)
+                    table.insert(runningLoops, loop)
                 end
             end)
+            table.insert(runningLoops, connection)
+
+            -- 处理已经存在的按钮
+            for _, descendant in ipairs(gui:GetDescendants()) do
+                if descendant.Name == "button" and 
+                   descendant.Parent and 
+                   descendant.Parent.Name == "safezone" and
+                   descendant.Parent.Parent and 
+                   descendant.Parent.Parent.Name == "shakeui" then
+                    local loop
+                    loop = task.spawn(function()
+                        while descendant and descendant.Parent and state do
+                            clickButton(descendant)
+                            task.wait()
+                        end
+                    end)
+                    table.insert(runningLoops, loop)
+                end
+            end
+        end
+
+        setupButtonListener()
+    else
+        stopAllLoops()
+    end
+end)
+
+ts:Label("黑暗欺骗")
+ts:Button("拾取光环", function()
+    local player = game.Players.LocalPlayer
+    local isRunning = true
+    local emptyLocation = CFrame.new(-30, 23, -50)
+    local teleportCount = 0
+    local batchSize = 5
+
+    local function pickupShard(obj)
+        if not obj:IsA("BasePart") then return end
+
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+        if obj.Name == "Shard" or obj.Name == "RedShard" then
+            obj.CanCollide = false
+            obj.CFrame = humanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+            if obj:FindFirstChildWhichIsA("TouchTransmitter") then
+                firetouchinterest(humanoidRootPart, obj, 0)
+                firetouchinterest(humanoidRootPart, obj, 1)
+            end
+        elseif obj.Name == "OrangeShard" then
+            humanoidRootPart.CFrame = CFrame.new(obj.Position + Vector3.new(0, -3, 0))
+            task.wait(0.05)
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame + Vector3.new(0, 0.5, 0)
         end
     end
-end
 
-setupButtonListener()
+    local function runPickup()
+        while isRunning and teleportCount < 5 do
+            local shards = workspace:FindFirstChild("Shards")
+            if not shards then
+                task.wait(0.01)
+                continue
+            end
+
+            local shardList = shards:GetChildren()
+
+            if #shardList == 0 then
+                local character = player.Character or player.CharacterAdded:Wait()
+                local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+                humanoidRootPart.CFrame = emptyLocation
+                teleportCount = teleportCount + 1
+                print("Shadow:", teleportCount.."/5")
+                task.wait(0.01)
+            else
+                teleportCount = 0
+
+                for i = 1, #shardList, batchSize do
+                    task.spawn(function()
+                        for j = i, math.min(i + batchSize - 1, #shardList) do
+                            if not isRunning then break end
+                            pickupShard(shardList[j])
+                        end
+                    end)
+                    task.wait(0.01)
+                end
+            end
+            task.wait(0.01)
+        end
+    end
+
+    local cleanup = runPickup()
+    
+    return function()
+        isRunning = false
+        if cleanup then cleanup() end
+    end
+end)
+
+ts:Toggle("跳过追逐", false, function(isEnabled)
+    local player = game.Players.LocalPlayer
+    local running = true
+    local checkInterval = 0.3
+    local moveSpeed = 300
+    local arrivalThreshold = 2
+
+    local function chaseSkip()
+        while running and isEnabled do
+            local shards = workspace:FindFirstChild("Shards")
+            if shards and #shards:GetChildren() == 0 then
+                local character = player.Character
+                if character then
+                    local hrp = character:FindFirstChild("HumanoidRootPart")
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+                    if hrp and humanoid then
+                        local pos = hrp.Position
+                        if (pos - Vector3.new(-29, 21, -55)).Magnitude <= 3 then
+                            hrp.CFrame = CFrame.new(2, 21, 63)
+                            humanoid.WalkSpeed = moveSpeed
+
+                            local target = Vector3.new(38, 21, 63)
+                            while running and isEnabled and (hrp.Position - target).Magnitude > arrivalThreshold do
+                                humanoid:MoveTo(target)
+                                task.wait(0.1)
+                            end
+
+                            humanoid.WalkSpeed = 16
+                        end
+                    end
+                end
+            end
+            task.wait(checkInterval)
+        end
+    end
+
+    local cleanup = task.spawn(chaseSkip)
+    
+    return function()
+        running = false
+        if cleanup then task.cancel(cleanup) end
+    end
+end)
