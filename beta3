@@ -52,11 +52,10 @@ ImageButton.Parent = OpenUI
 ImageButton.BackgroundColor3 = Color3.fromRGB(5, 6, 7) 
 ImageButton.BackgroundTransparency = 0.500 
 ImageButton.Position = UDim2.new(0.0235790554, 0, 0.466334164, 0) 
-ImageButton.Size = UDim2.new(0, 50, 0, 50) 
-
-imageLabel.Image = Icon
-imageLabel.BackgroundTransparency = 0.5
-imageLabel.Parent = ImageButton
+ImageButton.Size = UDim2.new(0, 50, 0, 50)
+ImageButton.Image = Icon
+ImageButton.BackgroundTransparency = 0.5
+ImageButton.Parent = ImageButton
 ImageButton.Draggable = true 
 
 UICorner.CornerRadius = UDim.new(0, 25)
