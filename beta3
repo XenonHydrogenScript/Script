@@ -731,6 +731,7 @@ task.defer(function()
     WatchDoors("Door", DoorHighlights)
     WatchDoors("GardenGate", GardenGateHighlights)
 end)
+
 ts:Toggle("柜子透视", false, function(state)
     ToolshedEsp = state
     for _, cham in pairs(ToolshedHighlights) do
@@ -740,6 +741,7 @@ ts:Toggle("柜子透视", false, function(state)
         text.Enabled = state
     end
 end)
+
 local function ApplyToolshedHighlights(inst)
     local cham = Instance.new("Highlight")
     cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
@@ -752,7 +754,7 @@ local function ApplyToolshedHighlights(inst)
     cham.RobloxLocked = true
     
     local billboard = Instance.new("BillboardGui")
-    billboard.Name = "ToolshedLabel"
+    billboard.Name = "Label"
     billboard.Adornee = inst
     billboard.Size = UDim2.new(0, 50, 0, 30)
     billboard.StudsOffset = Vector3.new(0, 2, 0)
@@ -770,7 +772,7 @@ local function ApplyToolshedHighlights(inst)
     textLabel.TextColor3 = Color3.new(1, 1, 0)
     textLabel.TextSize = 14
     textLabel.Font = Enum.Font.GothamBlack
-    textLabel.TextStrokeColor3 = Color3.new(1, 1, 1)
+    textLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
     textLabel.TextStrokeTransparency = 0
     textLabel.TextStrokeThickness = 1
     textLabel.Parent = billboard
@@ -778,22 +780,27 @@ local function ApplyToolshedHighlights(inst)
     billboard.Parent = inst
     billboard.RobloxLocked = true
     
+    -- 存储到对应的表
+    table.insert(ToolshedHighlights, cham)
     table.insert(ToolshedTexts, billboard)
+    
     return cham
 end
 
+-- 监听新生成的柜子
 task.spawn(function()
     workspace.CurrentRooms.DescendantAdded:Connect(function(inst)
         if inst.Name == "Toolshed" then
-            table.insert(ToolshedHighlights, ApplyToolshedHighlights(inst))
+            ApplyToolshedHighlights(inst)
         end
     end)
 end)
 
+-- 初始化已存在的柜子
 task.defer(function()
     for _, v in ipairs(workspace:GetDescendants()) do
         if v.Name == "Toolshed" then
-            table.insert(ToolshedHighlights, ApplyToolshedHighlights(v))
+            ApplyToolshedHighlights(v)
         end
-    end)
+    end
 end)
