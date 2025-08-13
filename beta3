@@ -733,7 +733,6 @@ task.defer(function()
     WatchDoors("GardenGate", GardenGateHighlights)
 end)
 
-
 -- 获取玩家与柜子的距离
 local function GetDistanceFromPlayer(part)
     local player = game.Players.LocalPlayer
@@ -752,15 +751,21 @@ ts:Toggle("柜子透视", false, function(state)
     end
     -- 控制文本标签的显示/隐藏
     for _, text in pairs(ToolshedTexts) do
-        if text and text.Parent then -- 检查是否存在
+        if text and text.Parent then
             text.Enabled = state
         end
     end
     -- 控制距离更新的启停
     for _, connection in pairs(ToolshedConnections) do
         if state then
-            if connection.Disconnected then
-                connection:Connect() -- 重新连接（如果之前断开）
+            -- 重新激活更新（如果之前被关闭）
+            if not connection.Connected then
+                connection = game:GetService("RunService").Heartbeat:Connect(function()
+                    if ToolshedEsp and text.Parent then
+                        local distance = GetDistanceFromPlayer(text.Adornee)
+                        text:FindFirstChild("Label").Text = string.format("柜子 (%.1fm)", distance)
+                    end
+                end)
             end
         else
             connection:Disconnect()
@@ -801,26 +806,22 @@ local function ApplyToolshedHighlights(inst)
     textLabel.Font = Enum.Font.GothamBlack -- 粗体
     textLabel.TextStrokeColor3 = Color3.new(0, 0, 0) -- 黑色描边
     textLabel.TextStrokeTransparency = 0.3 -- 描边透明度
+    textLabel.Text = "柜子 (加载中...)" -- 初始占位文本
     textLabel.Parent = billboard
     
     -- 动态更新距离
-    local function updateDistance()
-        local distance = GetDistanceFromPlayer(inst)
-        textLabel.Text = string.format("柜子 (%.1fm)", distance) -- 显示1位小数
-    end
-
-    -- 启动距离更新
     local connection
     connection = game:GetService("RunService").Heartbeat:Connect(function()
-        if ToolshedEsp then
-            updateDistance()
+        if ToolshedEsp and billboard.Parent then
+            local distance = GetDistanceFromPlayer(inst)
+            textLabel.Text = string.format("柜子 (%.1fm)", distance)
         end
     end)
     
     table.insert(ToolshedConnections, connection)
     billboard.Parent = inst -- 确保 BillboardGui 正确绑定到柜子
     billboard.RobloxLocked = true
-    table.insert(ToolshedTexts, billboard) -- 确保存入表
+    table.insert(ToolshedTexts, billboard) -- 存入表
     
     return cham
 end
