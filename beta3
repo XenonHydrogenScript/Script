@@ -36,6 +36,8 @@ local GardenGateEsp = false
 local ToolshedHighlights = {}
 local ToolshedEsp = false
 local ToolshedTexts = {}
+local currentRoom = workspace.CurrentRoom
+local targetSoundNames = {"SoundFly", "SoundCawLight", "SoundCaw"}
 local Players = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
 local player = Players.LocalPlayer
@@ -756,7 +758,7 @@ local function ApplyToolshedHighlights(inst)
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "ToolshedLabel"
     billboard.Adornee = inst
-    billboard.Size = UDim2.new(0, 200, 0, 50)
+    billboard.Size = UDim2.new(0, 100, 0, 30)
     billboard.StudsOffset = Vector3.new(0, 2, 0)
     billboard.AlwaysOnTop = true
     billboard.LightInfluence = 1
@@ -770,7 +772,7 @@ local function ApplyToolshedHighlights(inst)
     textLabel.BackgroundTransparency = 1
     textLabel.Text = "柜子"
     textLabel.TextColor3 = Color3.new(1, 1, 0)
-    textLabel.TextScaled = true
+    textLabel.TextSize = 14
     textLabel.Font = Enum.Font.SourceSansBold
     textLabel.Parent = billboard
     
@@ -794,5 +796,11 @@ task.defer(function()
         if v.Name == "Toolshed" then
             table.insert(ToolshedHighlights, ApplyToolshedHighlights(v))
         end
+    end
+end)
+ts:Button("移除烦人的乌鸦叫声", function()
+for _, child in ipairs(currentRoom:GetChildren()) do
+    if child:IsA("Sound") and table.find(targetSoundNames, child.Name) then
+        child:Destroy()
     end
 end)
