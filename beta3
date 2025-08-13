@@ -18,28 +18,11 @@ newLBL.TextSize = 14
 newLBL.TextWrapped = true
 newLBL.Visible = true
 
-local OpenUI = Instance.new("ScreenGui")
-local Icon = "rbxassetid://80911866331412"
-local ImageButton = Instance.new("ImageButton")
-local UICorner = Instance.new("UICorner")
-
-game:GetService("ContentProvider"):PreloadAsync({Icon})
-
-OpenUI.Name = "OpenUI"
-OpenUI.Parent = game:GetService("CoreGui")
-OpenUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-ImageButton.Image = Icon
-ImageButton.BackgroundColor3 = Color3.fromRGB(5, 6, 7)
-ImageButton.BackgroundTransparency = 0.5
-ImageButton.Size = UDim2.new(0, 50, 0, 50)
-ImageButton.Position = UDim2.new(0.023, 0, 0.466, 0)
-ImageButton.Parent = OpenUI
-ImageButton.Draggable = true
-
-UICorner.CornerRadius = UDim.new(0, 25)
-UICorner.Parent = ImageButton
-
+local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonHydrogenScript/Script/refs/heads/main/beta2")() 
+local OpenUI = Instance.new("ScreenGui") 
+local Icon = "rbxassetid://16691034743"
+local ImageButton = Instance.new("ImageButton") 
+local UICorner = Instance.new("UICorner") 
 local uihide = false
 local CoreGui = game:GetService("StarterGui")
 local WardrobeHighlights = {}
@@ -61,6 +44,20 @@ local GuiService = game:GetService("GuiService")
 local player = Players.LocalPlayer
 local gui = player:WaitForChild("PlayerGui")
 
+OpenUI.Name = "OpenUI" 
+OpenUI.Parent = game:GetService("CoreGui")
+OpenUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling 
+
+ImageButton.BackgroundColor3 = Color3.fromRGB(5, 6, 7)
+ImageButton.Position = UDim2.new(0.0235790554, 0, 0.466334164, 0) 
+ImageButton.Size = UDim2.new(0, 50, 0, 50)
+ImageButton.Image = Icon
+ImageButton.BackgroundTransparency = 0.5
+ImageButton.Parent = OpenUI
+ImageButton.Draggable = true 
+
+UICorner.CornerRadius = UDim.new(0, 25)
+UICorner.Parent = ImageButton 
 ImageButton.MouseButton1Click:Connect(function() 
     if uihide then
         uihide = false
