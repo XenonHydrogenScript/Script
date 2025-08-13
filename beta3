@@ -772,10 +772,8 @@ local function ApplyToolshedHighlights(inst)
     textLabel.BackgroundTransparency = 1
     textLabel.Text = "柜子"
     textLabel.TextColor3 = Color3.new(1, 1, 0)
-    textLabel.TextSize = 14
-    textLabel.Font = Enum.Font.GothamBlack
-    textLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
-    textLabel.TextStrokeTransparency = 0.3
+    textLabel.TextSize = 13
+    textLabel.Font = Enum.Font.SourceSansBold
     textLabel.Parent = billboard
     table.insert(ToolshedTexts, billboard)
     return cham
