@@ -36,6 +36,7 @@ local GardenGateEsp = false
 local ToolshedHighlights = {}
 local ToolshedEsp = false
 local ToolshedTexts = {}
+local ToolshedConnections = {}
 local Players = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
 local player = Players.LocalPlayer
@@ -731,18 +732,35 @@ task.defer(function()
     WatchDoors("Door", DoorHighlights)
     WatchDoors("GardenGate", GardenGateHighlights)
 end)
+
 ts:Toggle("柜子透视", false, function(state)
     ToolshedEsp = state
     for _, cham in pairs(ToolshedHighlights) do
         cham.Enabled = state
     end
-    -- 同时控制文本的可见性
     for _, text in pairs(ToolshedTexts) do
         text.Enabled = state
     end
+    for _, connection in pairs(ToolshedConnections) do
+        if state then
+            if connection.Disconnected then
+                connection:Reconnect()
+            end
+        else
+            connection:Disconnect()
+        end
+    end
 end)
-local function ApplyToolshedHighlights(inst)
-    -- 高亮部分
+
+    local function GetDistanceFromPlayer(part)
+    local player = game.Players.LocalPlayer
+    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        return (player.Character.HumanoidRootPart.Position - part.Position).Magnitude
+    end
+    return 0
+end
+
+    local function ApplyToolshedHighlights(inst)
     local cham = Instance.new("Highlight")
     cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
     cham.FillColor = Color3.new(245, 245, 245)
@@ -753,7 +771,6 @@ local function ApplyToolshedHighlights(inst)
     cham.Enabled = ToolshedEsp
     cham.RobloxLocked = true
     
-    -- 文本部分
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "ToolshedLabel"
     billboard.Adornee = inst
@@ -769,15 +786,24 @@ local function ApplyToolshedHighlights(inst)
     textLabel.Name = "Label"
     textLabel.Size = UDim2.new(1, 0, 1, 0)
     textLabel.BackgroundTransparency = 1
-    textLabel.Text = "柜子"
     textLabel.TextColor3 = Color3.new(1, 1, 0)
     textLabel.TextSize = 14
-    textLabel.Font = Enum.Font.GothamBlack
+    textLabel.Font = Enum.Font.GothamBlack -- 粗体
+    textLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    textLabel.TextStrokeTransparency = 0.3
     textLabel.Parent = billboard
     
+    local connection
+    connection = game:GetService("RunService").Heartbeat:Connect(function()
+        if ToolshedEsp then
+            local distance = GetDistanceFromPlayer(inst)
+            textLabel.Text = string.format("柜子 (%.1fm)", distance)
+        end
+    end)
+    
+    table.insert(ToolshedConnections, connection)
     billboard.Parent = inst
     billboard.RobloxLocked = true
-    
     table.insert(ToolshedTexts, billboard)
     return cham
 end
