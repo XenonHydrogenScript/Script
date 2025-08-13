@@ -758,7 +758,7 @@ local function ApplyToolshedHighlights(inst)
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "ToolshedLabel"
     billboard.Adornee = inst
-    billboard.Size = UDim2.new(0, 20, 0, 5)
+    billboard.Size = UDim2.new(0, 60, 0, 20)
     billboard.StudsOffset = Vector3.new(0, 2, 0) -- 在物体上方显示
     billboard.AlwaysOnTop = true
     billboard.LightInfluence = 1
@@ -772,7 +772,7 @@ local function ApplyToolshedHighlights(inst)
     textLabel.BackgroundTransparency = 1
     textLabel.Text = "柜子"
     textLabel.TextColor3 = Color3.new(1, 1, 0)
-    textLabel.TextSize = 12
+    textLabel.TextSize = 14
     textLabel.Font = Enum.Font.GothamBlack
     textLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
     textLabel.TextStrokeTransparency = 0.3
