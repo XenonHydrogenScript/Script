@@ -36,7 +36,6 @@ local GeneratorEsp = false
 local ToolshedHighlights = {}
 local ToolshedEsp = false
 local ToolshedTexts = {}
-local currentRooms = workspace.CurrentRooms
 local targetSoundNames = {"SoundFly", "SoundCawLight", "SoundCaw"}
 local Players = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
@@ -84,6 +83,7 @@ local xx = win:Tab("| 信息 |")
 local gn = win:Tab("| 功能 |")
 local zs = win:Tab("| 自身 |")
 local ts = win:Tab("| 调试 |")
+local gm = win:Tab("| 购买 |")
 
 xx:Label("作者:Fluorstar")
 xx:Label("服务器ID:" .. game.GameId .. ".")
@@ -848,3 +848,25 @@ ts:Button("移除烦人的乌鸦叫声", function()
         end
     end
 end)
+
+    gm:Label("-----忍者传奇-----")
+    gm:Button("故障: 觉醒的夜行者[绝版宠物]", function()
+    game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("GLITCH: Awakened Nighthunter"))
+   gm:Button("上升千年水螅[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Rising Millenium Hydra"))
+   gm:Button("高超音速飞马[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Hypersonic Pegasus"))
+   gm:Button("内心黑暗九头蛇[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Inner Darkness Hydra"))
+   gm:Button("闪电小兔[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Lightning Bolt Bunny"))
+   gm:Button("雷击幻影[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Lightning Strike Phantom"))
+   gm:Button("赛博：远古大师幽灵[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("CYBER: Ancient Master Wraith"))
+   gm:Button("损坏的元素Hydra[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Corrupted Elements Hydra"))
+   gm:Button("上升千年水螅[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Rising Millenium Hydra"))
+   gm:Button("上升千年水螅[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Rising Millenium Hydra"))
