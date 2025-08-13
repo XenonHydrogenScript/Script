@@ -734,6 +734,7 @@ task.defer(function()
 end)
 
 
+-- 获取玩家与柜子的距离
 local function GetDistanceFromPlayer(part)
     local player = game.Players.LocalPlayer
     if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
@@ -751,13 +752,15 @@ ts:Toggle("柜子透视", false, function(state)
     end
     -- 控制文本标签的显示/隐藏
     for _, text in pairs(ToolshedTexts) do
-        text.Enabled = state
+        if text and text.Parent then -- 检查是否存在
+            text.Enabled = state
+        end
     end
     -- 控制距离更新的启停
     for _, connection in pairs(ToolshedConnections) do
         if state then
-            if not connection.Connected then  -- 如果连接已断开，重新连接
-                connection:Connect()
+            if connection.Disconnected then
+                connection:Connect() -- 重新连接（如果之前断开）
             end
         else
             connection:Disconnect()
@@ -769,9 +772,9 @@ local function ApplyToolshedHighlights(inst)
     -- 高亮部分
     local cham = Instance.new("Highlight")
     cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    cham.FillColor = Color3.new(245, 245, 245)  -- 浅灰色填充
+    cham.FillColor = Color3.new(245, 245, 245) -- 浅灰色填充
     cham.FillTransparency = 0.5
-    cham.OutlineColor = Color3.new(1, 1, 0)     -- 黄色边框
+    cham.OutlineColor = Color3.new(1, 1, 0) -- 黄色边框
     cham.Parent = inst
     cham.Adornee = inst
     cham.Enabled = ToolshedEsp
@@ -781,7 +784,7 @@ local function ApplyToolshedHighlights(inst)
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "ToolshedLabel"
     billboard.Adornee = inst
-    billboard.Size = UDim2.new(0, 100, 0, 30)   -- 适当宽度以容纳距离文本
+    billboard.Size = UDim2.new(0, 100, 0, 30) -- 足够宽度显示距离
     billboard.StudsOffset = Vector3.new(0, 2, 0) -- 在柜子上方显示
     billboard.AlwaysOnTop = true
     billboard.LightInfluence = 1
@@ -793,17 +796,17 @@ local function ApplyToolshedHighlights(inst)
     textLabel.Name = "Label"
     textLabel.Size = UDim2.new(1, 0, 1, 0)
     textLabel.BackgroundTransparency = 1
-    textLabel.TextColor3 = Color3.new(1, 1, 0)  -- 黄色文字
+    textLabel.TextColor3 = Color3.new(1, 1, 0) -- 黄色文字
     textLabel.TextSize = 14
-    textLabel.Font = Enum.Font.GothamBlack      -- 粗体
-    textLabel.TextStrokeColor3 = Color3.new(0, 0, 0)  -- 黑色描边
-    textLabel.TextStrokeTransparency = 0.3      -- 描边透明度
+    textLabel.Font = Enum.Font.GothamBlack -- 粗体
+    textLabel.TextStrokeColor3 = Color3.new(0, 0, 0) -- 黑色描边
+    textLabel.TextStrokeTransparency = 0.3 -- 描边透明度
     textLabel.Parent = billboard
     
     -- 动态更新距离
     local function updateDistance()
         local distance = GetDistanceFromPlayer(inst)
-        textLabel.Text = string.format("柜子 (%.1fm)", distance)  -- 显示1位小数
+        textLabel.Text = string.format("柜子 (%.1fm)", distance) -- 显示1位小数
     end
 
     -- 启动距离更新
@@ -815,9 +818,10 @@ local function ApplyToolshedHighlights(inst)
     end)
     
     table.insert(ToolshedConnections, connection)
-    billboard.Parent = inst
+    billboard.Parent = inst -- 确保 BillboardGui 正确绑定到柜子
     billboard.RobloxLocked = true
-    table.insert(ToolshedTexts, billboard)
+    table.insert(ToolshedTexts, billboard) -- 确保存入表
+    
     return cham
 end
 
