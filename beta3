@@ -18,7 +18,7 @@ newLBL.TextSize = 14
 newLBL.TextWrapped = true
 newLBL.Visible = true
 
-local lib = loadstring(game:HttpGet"https://raw.githubusercontent.com/XenonHydrogenScript/Script/refs/heads/main/beta2")() 
+local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonHydrogenScript/Script/refs/heads/main/beta2")() 
 local OpenUI = Instance.new("ScreenGui") 
 local ImageButton = Instance.new("ImageButton") 
 local UICorner = Instance.new("UICorner") 
@@ -86,7 +86,7 @@ local gn = win:Tab("| 功能 |")
 local zs = win:Tab("| 自身 |")
 local ts = win:Tab("| 调试 |")
 
-xx:Label("作者:Nitro")
+xx:Label("作者:Fluorstar")
 xx:Label("服务器ID:" .. game.GameId .. ".")
 
 zs:Label("-----通用-----")
