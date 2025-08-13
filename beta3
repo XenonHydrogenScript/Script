@@ -36,6 +36,9 @@ local GeneratorEsp = false
 local ToolshedHighlights = {}
 local ToolshedEsp = false
 local ToolshedTexts = {}
+local LotusPetalPickupHighlights = {}
+local LotusPetalPickupEsp = false
+local LotusPetalPickupTexts = {}
 local targetSoundNames = {"SoundFly", "SoundCawLight", "SoundCaw"}
 local Players = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
@@ -841,6 +844,134 @@ task.defer(function()
         end
     end
 end)
+ts:Toggle("莲花瓣透视", false, function(state)
+    LotusPetalPickupEsp = state
+    for _, cham in pairs(LotusPetalPickupHighlights) do
+        cham.Enabled = state
+    end
+    for _, text in pairs(LotusPetalPickupTexts) do
+        text.Enabled = state
+    end
+end)
+
+local function ApplyLotusPetalPickupHighlights(inst)
+    local cham = Instance.new("Highlight")
+    cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    cham.FillColor = Color3.new(245, 245, 245)
+    cham.FillTransparency = 0.5
+    cham.OutlineColor = Color3.new(1, 1, 0)
+    cham.Parent = inst
+    cham.Adornee = inst
+    cham.Enabled = LotusPetalPickupEsp
+    cham.RobloxLocked = true
+    
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "LotusPetalPickupLabel"
+    billboard.Adornee = inst
+    billboard.Size = UDim2.new(0, 100, 0, 30)
+    billboard.StudsOffset = Vector3.new(0, 2, 0)
+    billboard.AlwaysOnTop = true
+    billboard.LightInfluence = 1
+    billboard.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    billboard.Active = true
+    billboard.Enabled = LotusPetalPickupEsp
+    
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Name = "Label"
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = "莲花瓣"
+    textLabel.TextColor3 = Color3.new(1, 1, 0)
+    textLabel.TextSize = 14
+    textLabel.Font = Enum.Font.SourceSansBold
+    textLabel.Parent = billboard
+    
+    billboard.Parent = inst
+    billboard.RobloxLocked = true
+    
+    table.insert(ToolshedTexts, billboard)
+    return cham
+end
+
+task.spawn(function()
+    workspace.CurrentRooms.DescendantAdded:Connect(function(inst)
+        if inst.Name == "LotusPetalPickup" then
+            table.insert(LotusPetalPickupHighlights, ApplyLotusPetalPickupHighlights(inst))
+        end
+    end)
+end)
+
+task.defer(function()
+    for _, v in ipairs(workspace:GetDescendants()) do
+        if v.Name == "LotusPetalPickup" then
+            table.insert(ToolshedHighlights, ApplyLotusPetalPickupHighlights(v))
+        end
+    end
+end)
+ts:Toggle("柜子透视", false, function(state)
+    Chest_VineEsp = state
+    for _, cham in pairs(Chest_VineHighlights) do
+        cham.Enabled = state
+    end
+    for _, text in pairs(Chest_VineTexts) do
+        text.Enabled = state
+    end
+end)
+
+local function ApplyChest_VineHighlights(inst)
+    local cham = Instance.new("Highlight")
+    cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    cham.FillColor = Color3.new(245, 245, 245)
+    cham.FillTransparency = 0.5
+    cham.OutlineColor = Color3.new(1, 1, 0)
+    cham.Parent = inst
+    cham.Adornee = inst
+    cham.Enabled = Chest_VineEsp
+    cham.RobloxLocked = true
+    
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "ToolshedLabel"
+    billboard.Adornee = inst
+    billboard.Size = UDim2.new(0, 100, 0, 30)
+    billboard.StudsOffset = Vector3.new(0, 2, 0)
+    billboard.AlwaysOnTop = true
+    billboard.LightInfluence = 1
+    billboard.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    billboard.Active = true
+    billboard.Enabled = Chest_VineEsp
+    
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Name = "Label"
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = "藤纹"
+    textLabel.TextColor3 = Color3.new(1, 1, 0)
+    textLabel.TextSize = 14
+    textLabel.Font = Enum.Font.SourceSansBold
+    textLabel.Parent = billboard
+    
+    billboard.Parent = inst
+    billboard.RobloxLocked = true
+    
+    table.insert(Chest_VineTexts, billboard)
+    return cham
+end
+
+task.spawn(function()
+    workspace.CurrentRooms.DescendantAdded:Connect(function(inst)
+        if inst.Name == "Chest_Vine" then
+            table.insert(Chest_VineHighlights, ApplyChest_VineHighlights(inst))
+        end
+    end)
+end)
+
+task.defer(function()
+    for _, v in ipairs(workspace:GetDescendants()) do
+        if v.Name == "Chest_Vine" then
+            table.insert(Chest_VineHighlights, ApplyChest_VineHighlights(v))
+        end
+    end
+end)
 ts:Button("移除烦人的乌鸦叫声", function()
     for _, sound in ipairs(workspace:GetDescendants()) do
         if sound:IsA("Sound") and table.find(targetSoundNames, sound.Name) then
@@ -866,11 +997,35 @@ gm:Button("闪电小兔[绝版宠物]", function()
    game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Lightning Bolt Bunny"))
    end)
 gm:Button("雷击幻影[绝版宠物]", function()
-   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Lightning Strike Phantom")
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Lightning Strike Phantom"))
    end)
 gm:Button("赛博：远古大师幽灵[绝版宠物]", function()
    game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("CYBER: Ancient Master Wraith"))
    end)
 gm:Button("损坏的元素Hydra[绝版宠物]", function()
    game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Corrupted Elements Hydra"))
+   end)
+gm:Button("黑暗风暴元素九头蛇[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Darkstorm Elemental Hydra"))
+   end)
+gm:Button("阴影边缘小猫[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Shadows Edge Kitty"))
+   end)
+gm:Button("天蓝欧米茄飞马[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Azure Series Omega Pegasus"))
+   end)
+gm:Button("宇宙猎人龙[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Cosmic Hunter Dragon"))
+   end)
+gm:Button("蔚蓝神奇猫[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Azure Wonder Kitty"))
+   end)
+gm:Button("古代地狱猫[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Ancient Inferno Kitty"))
+   end)
+gm:Button("零度以下的冰霜九头蛇[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Sub-Zero Frost Hydra"))
+   end)
+gm:Button("终极超新星飞马[绝版宠物]", function()
+   game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(game:GetService("ReplicatedStorage").cPetShopFolder:FindFirstChild("Ultimate Supernova Pegasus"))
    end)
