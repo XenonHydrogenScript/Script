@@ -734,9 +734,9 @@ ts:Toggle("柜子透视", false, function(state)
     ToolshedEsp = state
     for _, cham in pairs(ToolshedHighlights) do
         cham.Enabled = state
-        -- 同步文本显示状态
-        if cham.TextGui then
-            cham.TextGui.Enabled = state
+        -- 同步文本零件显示状态
+        if cham.TextPart then
+            cham.TextPart.Visible = state
         end
     end
 end)
@@ -753,24 +753,39 @@ local function ApplyToolshedHighlights(inst)
     cham.Enabled = ToolshedEsp
     cham.RobloxLocked = true
 
-    -- 新增：用SurfaceGui显示文本（贴在物体表面）
+    -- 新增：用Part+SurfaceGui显示3D文本
+    local textPart = Instance.new("Part")
+    textPart.Name = "TextPart"
+    textPart.Parent = inst -- 挂在目标下
+    textPart.Anchored = false -- 跟随目标移动
+    textPart.CanCollide = false -- 不碰撞
+    textPart.Size = Vector3.new(3, 1, 0.1) -- 文本板大小
+    textPart.Position = inst.Position + Vector3.new(0, 2, 0) -- 显示在目标上方
+    textPart.CFrame = CFrame.new(textPart.Position) * CFrame.Angles(0, math.rad(180), 0) -- 面向玩家
+    textPart.Transparency = 1 -- 零件本身透明
+
+    -- 表面文本
     local surfaceGui = Instance.new("SurfaceGui")
-    surfaceGui.Name = "TextGui"
-    surfaceGui.Parent = cham
-    surfaceGui.Adornee = inst -- 附着的物体
-    surfaceGui.Face = Enum.NormalId.Top -- 贴在物体的“顶部”面（可改：Front/Back/Left/Right/Bottom）
-    surfaceGui.CanvasSize = Vector2.new(200, 50) -- 画布大小
-    surfaceGui.Enabled = ToolshedEsp -- 与高亮同步开关
+    surfaceGui.Parent = textPart
+    surfaceGui.Face = Enum.NormalId.Front -- 正面显示
+    surfaceGui.CanvasSize = Vector2.new(300, 100)
 
     local textLabel = Instance.new("TextLabel")
     textLabel.Parent = surfaceGui
-    textLabel.Size = UDim2.new(1, 0, 1, 0) -- 占满整个SurfaceGui
-    textLabel.Text = "柜子" -- 显示的文本
-    textLabel.TextScaled = true -- 自动缩放文字
-    textLabel.BackgroundTransparency = 1 -- 背景透明
-    textLabel.TextColor3 = Color3.new(1, 1, 1) -- 白色文字
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.Text = "柜子"
+    textLabel.TextScaled = true
+    textLabel.BackgroundTransparency = 1
+    textLabel.TextColor3 = Color3.new(1, 1, 0) -- 黄色文字
 
-    cham.TextGui = surfaceGui -- 保存引用，方便控制开关
+    -- 让文本零件跟随目标
+    local weld = Instance.new("WeldConstraint")
+    weld.Parent = textPart
+    weld.Part0 = inst
+    weld.Part1 = textPart
+
+    cham.TextPart = textPart -- 保存引用
+    textPart.Visible = ToolshedEsp -- 初始状态
 
     return cham
 end
