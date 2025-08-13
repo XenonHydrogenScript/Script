@@ -694,81 +694,69 @@ ts:Toggle("跳过追逐[进电梯开启]", false, function(isEnabled)
 end)
 
 ts:Label("-----Doors - The Outdoor-----")
-ts:Toggle("房门透视", false, function(state)
-    doorEsp = state
-    for _, data in pairs(DoorHighlights) do
-        if data.highlight then data.highlight.Enabled = state end
-        if data.text then data.text.Enabled = state end
+ts:Toggle("门透视", false, function(state)
+    DoorEsp = state
+    for _, cham in pairs(DoorHighlights) do
+        cham.Enabled = state
     end
-    for _, data in pairs(GardenGateHighlights) do
-        if data.highlight then data.highlight.Enabled = state end
-        if data.text then data.text.Enabled = state end
+    for _, text in pairs(DoorTexts) do
+        text.Enabled = state
     end
 end)
 
 local function ApplyDoorHighlights(inst)
-    if not inst then return nil end
-    
-    -- 高光效果
     local cham = Instance.new("Highlight")
     cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    cham.FillColor = Color3.new(0, 1, 0)  -- 绿色填充
+    cham.FillColor = Color3.new(245, 245, 245)
     cham.FillTransparency = 0.5
-    cham.OutlineColor = Color3.new(1, 1, 0)  -- 黄色边框
+    cham.OutlineColor = Color3.new(1, 1, 0)
     cham.Parent = inst
     cham.Adornee = inst
-    cham.Enabled = doorEsp
+    cham.Enabled = DoorEsp
     cham.RobloxLocked = true
     
-    -- 文字显示
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "DoorLabel"
     billboard.Adornee = inst
-    billboard.Size = UDim2.new(0, 100, 0, 40)
-    billboard.StudsOffset = Vector3.new(0, 2.5, 0)  -- 在门上方显示
+    billboard.Size = UDim2.new(0, 100, 0, 30)
+    billboard.StudsOffset = Vector3.new(0, 2, 0)
     billboard.AlwaysOnTop = true
     billboard.LightInfluence = 1
-    billboard.Enabled = doorEsp
+    billboard.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    billboard.Active = true
+    billboard.Enabled = DoorEsp
     
     local textLabel = Instance.new("TextLabel")
+    textLabel.Name = "Label"
     textLabel.Size = UDim2.new(1, 0, 1, 0)
     textLabel.BackgroundTransparency = 1
-    textLabel.Text = inst.Name == "房门" or "花园门"  -- 根据名称显示不同文字
-    textLabel.TextColor3 = Color3.new(1, 1, 0)  -- 黄色文字
-    textLabel.TextSize = 16
-    textLabel.Font = Enum.Font.GothamBold
-    textLabel.TextStrokeColor3 = Color3.new(0, 0, 0)  -- 黑色描边
-    textLabel.TextStrokeTransparency = 0.3
+    textLabel.Text = "门"
+    textLabel.TextColor3 = Color3.new(1, 1, 0)
+    textLabel.TextSize = 14
+    textLabel.Font = Enum.Font.SourceSansBold
     textLabel.Parent = billboard
     
     billboard.Parent = inst
     billboard.RobloxLocked = true
     
-    return {
-        highlight = cham,
-        text = billboard
-    }
+    table.insert(ToolshedTexts, billboard)
+    return cham
 end
 
-local function WatchDoors(Door, highlightTable, textTable)
+task.spawn(function()
     workspace.CurrentRooms.DescendantAdded:Connect(function(inst)
-        if inst.Name == Door then
-            local data = ApplyDoorHighlights(inst)
-            table.insert(highlightTable, data)
+        if inst.Name == "Door" then
+            table.insert(DoorHighlights, ApplyDoorHighlights(inst))
         end
     end)
-    
-    for _, v in ipairs(workspace:GetDescendants()) do
-        if v.Name == Door then
-            local data = ApplyDoorHighlights(v)
-            table.insert(highlightTable, data)
-        end
-    end
-end
+end)
 
 task.defer(function()
-    WatchDoors("Door", DoorHighlights, DoorTexts)
-    WatchDoors("GardenGate", GardenGateHighlights, GardenGateTexts)
+    for _, v in ipairs(workspace:GetDescendants()) do
+        if v.Name == "Door" then
+            table.insert(DoorHighlights, ApplyDoorHighlights(v))
+        end
+    end
 end)
 
 ts:Toggle("柜子透视", false, function(state)
