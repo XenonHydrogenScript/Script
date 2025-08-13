@@ -36,7 +36,6 @@ local GardenGateEsp = false
 local ToolshedHighlights = {}
 local ToolshedEsp = false
 local ToolshedTexts = {}
-local ToolshedConnections = {}
 local Players = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
 local player = Players.LocalPlayer
@@ -732,65 +731,31 @@ task.defer(function()
     WatchDoors("Door", DoorHighlights)
     WatchDoors("GardenGate", GardenGateHighlights)
 end)
-
--- 获取玩家与柜子的距离
-local function GetDistanceFromPlayer(part)
-    local player = game.Players.LocalPlayer
-    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        return (player.Character.HumanoidRootPart.Position - part.Position).Magnitude
-    end
-    return 0
-end
-
--- 开关控制
 ts:Toggle("柜子透视", false, function(state)
     ToolshedEsp = state
-    -- 控制高亮的显示/隐藏
     for _, cham in pairs(ToolshedHighlights) do
         cham.Enabled = state
     end
-    -- 控制文本标签的显示/隐藏
     for _, text in pairs(ToolshedTexts) do
-        if text and text.Parent then
-            text.Enabled = state
-        end
-    end
-    -- 控制距离更新的启停
-    for _, connection in pairs(ToolshedConnections) do
-        if state then
-            -- 重新激活更新（如果之前被关闭）
-            if not connection.Connected then
-                connection = game:GetService("RunService").Heartbeat:Connect(function()
-                    if ToolshedEsp and text.Parent then
-                        local distance = GetDistanceFromPlayer(text.Adornee)
-                        text:FindFirstChild("Label").Text = string.format("柜子 (%.1fm)", distance)
-                    end
-                end)
-            end
-        else
-            connection:Disconnect()
-        end
+        text.Enabled = state
     end
 end)
-
 local function ApplyToolshedHighlights(inst)
-    -- 高亮部分
     local cham = Instance.new("Highlight")
     cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    cham.FillColor = Color3.new(245, 245, 245) -- 浅灰色填充
+    cham.FillColor = Color3.new(245, 245, 245)
     cham.FillTransparency = 0.5
-    cham.OutlineColor = Color3.new(1, 1, 0) -- 黄色边框
+    cham.OutlineColor = Color3.new(1, 1, 0)
     cham.Parent = inst
     cham.Adornee = inst
     cham.Enabled = ToolshedEsp
     cham.RobloxLocked = true
     
-    -- 文本部分（带距离显示）
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "ToolshedLabel"
     billboard.Adornee = inst
-    billboard.Size = UDim2.new(0, 100, 0, 30) -- 足够宽度显示距离
-    billboard.StudsOffset = Vector3.new(0, 2, 0) -- 在柜子上方显示
+    billboard.Size = UDim2.new(0, 50, 0, 30)
+    billboard.StudsOffset = Vector3.new(0, 2, 0)
     billboard.AlwaysOnTop = true
     billboard.LightInfluence = 1
     billboard.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -801,32 +766,22 @@ local function ApplyToolshedHighlights(inst)
     textLabel.Name = "Label"
     textLabel.Size = UDim2.new(1, 0, 1, 0)
     textLabel.BackgroundTransparency = 1
-    textLabel.TextColor3 = Color3.new(1, 1, 0) -- 黄色文字
+    textLabel.Text = "柜子"
+    textLabel.TextColor3 = Color3.new(1, 1, 0)
     textLabel.TextSize = 14
-    textLabel.Font = Enum.Font.GothamBlack -- 粗体
-    textLabel.TextStrokeColor3 = Color3.new(0, 0, 0) -- 黑色描边
-    textLabel.TextStrokeTransparency = 0.3 -- 描边透明度
-    textLabel.Text = "柜子 (加载中...)" -- 初始占位文本
+    textLabel.Font = Enum.Font.GothamBlack
+    textLabel.TextStrokeColor3 = Color3.new(1, 1, 1)
+    textLabel.TextStrokeTransparency = 0
+    textLabel.TextStrokeThickness = 1
     textLabel.Parent = billboard
     
-    -- 动态更新距离
-    local connection
-    connection = game:GetService("RunService").Heartbeat:Connect(function()
-        if ToolshedEsp and billboard.Parent then
-            local distance = GetDistanceFromPlayer(inst)
-            textLabel.Text = string.format("柜子 (%.1fm)", distance)
-        end
-    end)
-    
-    table.insert(ToolshedConnections, connection)
-    billboard.Parent = inst -- 确保 BillboardGui 正确绑定到柜子
+    billboard.Parent = inst
     billboard.RobloxLocked = true
-    table.insert(ToolshedTexts, billboard) -- 存入表
     
+    table.insert(ToolshedTexts, billboard)
     return cham
 end
 
--- 监听新生成的柜子
 task.spawn(function()
     workspace.CurrentRooms.DescendantAdded:Connect(function(inst)
         if inst.Name == "Toolshed" then
@@ -835,11 +790,10 @@ task.spawn(function()
     end)
 end)
 
--- 初始化已存在的柜子
 task.defer(function()
     for _, v in ipairs(workspace:GetDescendants()) do
         if v.Name == "Toolshed" then
             table.insert(ToolshedHighlights, ApplyToolshedHighlights(v))
         end
-    end
+    end)
 end)
