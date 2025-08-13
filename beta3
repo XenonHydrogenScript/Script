@@ -18,7 +18,7 @@ newLBL.TextSize = 14
 newLBL.TextWrapped = true
 newLBL.Visible = true
 
-local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonHydrogenScript/Script/refs/heads/main/beta2"))()
+local lib = loadstring(game:HttpGet"https://raw.githubusercontent.com/XenonHydrogenScript/Script/refs/heads/main/beta2")()
 local OpenUI = Instance.new("ScreenGui") 
 local ImageButton = Instance.new("ImageButton") 
 local UICorner = Instance.new("UICorner") 
@@ -46,7 +46,6 @@ local gui = player:WaitForChild("PlayerGui")
 OpenUI.Name = "OpenUI" 
 OpenUI.Parent = game.CoreGui 
 OpenUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling 
-
 ImageButton.Parent = OpenUI 
 ImageButton.BackgroundColor3 = Color3.fromRGB(5, 6, 7) 
 ImageButton.BackgroundTransparency = 0.500 
