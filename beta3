@@ -52,7 +52,7 @@ ImageButton.BackgroundColor3 = Color3.fromRGB(5, 6, 7)
 ImageButton.BackgroundTransparency = 0.500 
 ImageButton.Position = UDim2.new(0.0235790554, 0, 0.466334164, 0) 
 ImageButton.Size = UDim2.new(0, 50, 0, 50) 
-ImageButton.Image = "rbxassetid://16691034743" 
+ImageButton.Image = "rbxassetid://10800748312" 
 ImageButton.Draggable = true 
 UICorner.CornerRadius = UDim.new(0, 200) 
 UICorner.Parent = ImageButton 
@@ -68,14 +68,14 @@ else
 end)
 
 local sound = Instance.new("Sound")
-sound.SoundId = "rbxassetid://6436188054"
+sound.SoundId = "rbxassetid://70527060448610"
 sound.Parent = game:GetService("SoundService")
 sound.Volume = 1
 sound:Play()
 
 CoreGui:SetCore("SendNotification", {
     Title = "Fluorine star",
-    Text = "用户:"..game.Players.LocalPlayer.Name.."拥有权限",
+    Text = "用户:"..game.Players.LocalPlayer.Name.."拥有访问权限",
     Duration = 10,
 })
 
