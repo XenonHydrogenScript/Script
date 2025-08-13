@@ -728,7 +728,7 @@ end)
 local function ApplyDoorHighlights(inst)
     local cham = Instance.new("Highlight")
     cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    cham.FillColor = Color3.new(245, 245, 245)
+    cham.FillColor = Color3.new(135, 206, 235)
     cham.FillTransparency = 0.5
     cham.OutlineColor = Color3.new(1, 1, 0)
     cham.Parent = inst
@@ -857,7 +857,7 @@ end)
 local function ApplyLotusPetalPickupHighlights(inst)
     local cham = Instance.new("Highlight")
     cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    cham.FillColor = Color3.new(245, 245, 245)
+    cham.FillColor = Color3.new(255, 165, 0)
     cham.FillTransparency = 0.5
     cham.OutlineColor = Color3.new(1, 1, 0)
     cham.Parent = inst
@@ -908,7 +908,7 @@ task.defer(function()
         end
     end
 end)
-ts:Toggle("柜子透视", false, function(state)
+ts:Toggle("储物箱透视", false, function(state)
     Chest_VineEsp = state
     for _, cham in pairs(Chest_VineHighlights) do
         cham.Enabled = state
@@ -921,7 +921,7 @@ end)
 local function ApplyChest_VineHighlights(inst)
     local cham = Instance.new("Highlight")
     cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    cham.FillColor = Color3.new(245, 245, 245)
+    cham.FillColor = Color3.new(255, 20, 147)
     cham.FillTransparency = 0.5
     cham.OutlineColor = Color3.new(1, 1, 0)
     cham.Parent = inst
@@ -930,7 +930,7 @@ local function ApplyChest_VineHighlights(inst)
     cham.RobloxLocked = true
     
     local billboard = Instance.new("BillboardGui")
-    billboard.Name = "ToolshedLabel"
+    billboard.Name = "Chest_VineLabel"
     billboard.Adornee = inst
     billboard.Size = UDim2.new(0, 100, 0, 30)
     billboard.StudsOffset = Vector3.new(0, 2, 0)
@@ -944,7 +944,7 @@ local function ApplyChest_VineHighlights(inst)
     textLabel.Name = "Label"
     textLabel.Size = UDim2.new(1, 0, 1, 0)
     textLabel.BackgroundTransparency = 1
-    textLabel.Text = "藤纹"
+    textLabel.Text = "被藤纹包裹的储物箱"
     textLabel.TextColor3 = Color3.new(1, 1, 0)
     textLabel.TextSize = 14
     textLabel.Font = Enum.Font.SourceSansBold
