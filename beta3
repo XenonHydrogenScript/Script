@@ -35,7 +35,7 @@ local GardenGateHighlights = {}
 local GardenGateEsp = false
 local ToolshedHighlights = {}
 local ToolshedEsp = false
-local staticLabels = {}
+local ToolshedTexts = {}
 local Players = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
 local player = Players.LocalPlayer
@@ -731,20 +731,19 @@ task.defer(function()
     WatchDoors("Door", DoorHighlights)
     WatchDoors("GardenGate", GardenGateHighlights)
 end)
-
 ts:Toggle("柜子透视", false, function(state)
     ToolshedEsp = state
     for _, cham in pairs(ToolshedHighlights) do
         cham.Enabled = state
     end
-    -- 控制文本标签显示状态
-    for _, label in ipairs(staticLabels) do
-        label.Visible = state
+    -- 同时控制文本的可见性
+    for _, text in pairs(ToolshedTexts) do
+        text.Enabled = state
     end
 end)
 
 local function ApplyToolshedHighlights(inst)
-    -- 原有高亮代码
+    -- 高亮部分
     local cham = Instance.new("Highlight")
     cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
     cham.FillColor = Color3.new(245, 245, 245)
@@ -754,29 +753,36 @@ local function ApplyToolshedHighlights(inst)
     cham.Adornee = inst
     cham.Enabled = ToolshedEsp
     cham.RobloxLocked = true
-
-    -- 创建仅显示"柜子"的文本标签
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Parent = game.Players.LocalPlayer.PlayerGui
-
+    
+    -- 文本部分
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "ToolshedLabel"
+    billboard.Adornee = inst
+    billboard.Size = UDim2.new(0, 200, 0, 50)
+    billboard.StudsOffset = Vector3.new(0, 2, 0) -- 在物体上方显示
+    billboard.AlwaysOnTop = true
+    billboard.LightInfluence = 1
+    billboard.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    billboard.Active = true
+    billboard.Enabled = ToolshedEsp
+    
     local textLabel = Instance.new("TextLabel")
-    textLabel.Parent = screenGui
-    textLabel.Text = "柜子"  -- 仅显示文字，不包含位置信息
-    textLabel.TextColor3 = Color3.new(1, 1, 1)  -- 白色文本
-    textLabel.BackgroundTransparency = 0.7  -- 更透明的背景，减少遮挡
-    textLabel.BackgroundColor3 = Color3.new(0, 0, 0)  -- 黑色背景
-    textLabel.TextScaled = true  -- 自动缩放文本适应大小
-    textLabel.Size = UDim2.new(0, 120, 0, 30)  -- 缩小尺寸，更简洁
-    -- 多个标签纵向错开排列（每个间隔40像素），避免重叠
-    textLabel.Position = UDim2.new(0, 10, 0, 10 + #staticLabels * 40)
-    textLabel.Visible = ToolshedEsp  -- 与透视开关状态同步
-
-    table.insert(staticLabels, textLabel)
-
+    textLabel.Name = "Label"
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = "柜子"
+    textLabel.TextColor3 = Color3.new(1, 1, 0) -- 黄色文字
+    textLabel.TextScaled = true
+    textLabel.Font = Enum.Font.SourceSansBold
+    textLabel.Parent = billboard
+    
+    billboard.Parent = inst
+    billboard.RobloxLocked = true
+    
+    table.insert(ToolshedTexts, billboard)
     return cham
 end
 
--- 监听新增零件并初始化现有零件（代码不变）
 task.spawn(function()
     workspace.CurrentRooms.DescendantAdded:Connect(function(inst)
         if inst.Name == "Toolshed" then
@@ -790,5 +796,5 @@ task.defer(function()
         if v.Name == "Toolshed" then
             table.insert(ToolshedHighlights, ApplyToolshedHighlights(v))
         end
-    end)
+    end
 end)
