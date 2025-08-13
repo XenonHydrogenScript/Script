@@ -36,7 +36,7 @@ local GardenGateEsp = false
 local ToolshedHighlights = {}
 local ToolshedEsp = false
 local ToolshedTexts = {}
-local currentRoom = workspace.CurrentRoom
+local currentRooms = workspace.CurrentRooms
 local targetSoundNames = {"SoundFly", "SoundCawLight", "SoundCaw"}
 local Players = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
@@ -799,8 +799,9 @@ task.defer(function()
     end
 end)
 ts:Button("移除烦人的乌鸦叫声", function()
-for _, child in ipairs(currentRoom:GetChildren()) do
-    if child:IsA("Sound") and table.find(targetSoundNames, child.Name) then
-        child:Destroy()
+    for _, sound in ipairs(workspace:GetDescendants()) do
+        if sound:IsA("Sound") and table.find(targetSoundNames, sound.Name) then
+            sound:Destroy()
+        end
     end
 end)
