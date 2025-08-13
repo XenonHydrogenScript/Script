@@ -28,11 +28,13 @@ local wardrobeEsp = false
 local KeyChams = {}
 local keyesp = false
 local DoorHighlights = {}
-local doorEsp = false
+local DoorEsp = false
+local DoorTexts = {}
 local GeneratorHighlights = {}
 local GeneratorEsp = false
 local GardenGateHighlights = {}
 local GardenGateEsp = false
+local GardenGateTexts = {}
 local ToolshedHighlights = {}
 local ToolshedEsp = false
 local ToolshedTexts = {}
@@ -439,7 +441,7 @@ task.defer(function()
     end
 end)
 gn:Toggle("房门大范围透视", false, function(state)
-    doorEsp = state
+    DoorEsp = state
     for _, cham in pairs(DoorHighlights) do
         cham.Enabled = state
     end
@@ -453,7 +455,7 @@ local function ApplyDoorHighlights(inst)
     cham.OutlineColor = Color3.new(1, 1, 0)
     cham.Parent = inst
     cham.Adornee = inst
-    cham.Enabled = doorEsp
+    cham.Enabled = DoorEsp
     cham.RobloxLocked = true
     return cham
 end
@@ -694,44 +696,79 @@ end)
 ts:Label("-----Doors - The Outdoor-----")
 ts:Toggle("房门透视", false, function(state)
     doorEsp = state
-    for _, cham in pairs(DoorHighlights) do
-        if cham then cham.Enabled = state end
+    for _, data in pairs(DoorHighlights) do
+        if data.highlight then data.highlight.Enabled = state end
+        if data.text then data.text.Enabled = state end
     end
-    for _, cham in pairs(GardenGateHighlights) do
-        if cham then cham.Enabled = state end
+    for _, data in pairs(GardenGateHighlights) do
+        if data.highlight then data.highlight.Enabled = state end
+        if data.text then data.text.Enabled = state end
     end
 end)
 
 local function ApplyDoorHighlights(inst)
-    if not inst then return end
+    if not inst then return nil end
+    
+    -- 高光效果
     local cham = Instance.new("Highlight")
     cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    cham.FillColor = Color3.new(0, 1, 0)
+    cham.FillColor = Color3.new(0, 1, 0)  -- 绿色填充
     cham.FillTransparency = 0.5
-    cham.OutlineColor = Color3.new(1, 1, 0)
+    cham.OutlineColor = Color3.new(1, 1, 0)  -- 黄色边框
     cham.Parent = inst
     cham.Adornee = inst
     cham.Enabled = doorEsp
     cham.RobloxLocked = true
-    return cham
+    
+    -- 文字显示
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "DoorLabel"
+    billboard.Adornee = inst
+    billboard.Size = UDim2.new(0, 100, 0, 40)
+    billboard.StudsOffset = Vector3.new(0, 2.5, 0)  -- 在门上方显示
+    billboard.AlwaysOnTop = true
+    billboard.LightInfluence = 1
+    billboard.Enabled = doorEsp
+    
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = inst.Name == "房门" or "花园门"  -- 根据名称显示不同文字
+    textLabel.TextColor3 = Color3.new(1, 1, 0)  -- 黄色文字
+    textLabel.TextSize = 16
+    textLabel.Font = Enum.Font.GothamBold
+    textLabel.TextStrokeColor3 = Color3.new(0, 0, 0)  -- 黑色描边
+    textLabel.TextStrokeTransparency = 0.3
+    textLabel.Parent = billboard
+    
+    billboard.Parent = inst
+    billboard.RobloxLocked = true
+    
+    return {
+        highlight = cham,
+        text = billboard
+    }
 end
 
-local function WatchDoors(Door, highlightTable)
+local function WatchDoors(Door, highlightTable, textTable)
     workspace.CurrentRooms.DescendantAdded:Connect(function(inst)
         if inst.Name == Door then
-            table.insert(highlightTable, ApplyDoorHighlights(inst))
+            local data = ApplyDoorHighlights(inst)
+            table.insert(highlightTable, data)
         end
     end)
+    
     for _, v in ipairs(workspace:GetDescendants()) do
         if v.Name == Door then
-            table.insert(highlightTable, ApplyDoorHighlights(v))
+            local data = ApplyDoorHighlights(v)
+            table.insert(highlightTable, data)
         end
     end
 end
 
 task.defer(function()
-    WatchDoors("Door", DoorHighlights)
-    WatchDoors("GardenGate", GardenGateHighlights)
+    WatchDoors("Door", DoorHighlights, DoorTexts)
+    WatchDoors("GardenGate", GardenGateHighlights, GardenGateTexts)
 end)
 
 ts:Toggle("柜子透视", false, function(state)
