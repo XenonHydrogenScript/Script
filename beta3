@@ -741,10 +741,6 @@ ts:Toggle("柜子透视", false, function(state)
         text.Enabled = state
     end
 end)
-
--- 存储文本对象的表
-local ToolshedTexts = {}
-
 local function ApplyToolshedHighlights(inst)
     -- 高亮部分
     local cham = Instance.new("Highlight")
@@ -761,8 +757,8 @@ local function ApplyToolshedHighlights(inst)
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "ToolshedLabel"
     billboard.Adornee = inst
-    billboard.Size = UDim2.new(0, 100, 0, 25)
-    billboard.StudsOffset = Vector3.new(0, 2, 0)
+    billboard.Size = UDim2.new(0, 200, 0, 50)
+    billboard.StudsOffset = Vector3.new(0, 2, 0) -- 在物体上方显示
     billboard.AlwaysOnTop = true
     billboard.LightInfluence = 1
     billboard.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -774,8 +770,7 @@ local function ApplyToolshedHighlights(inst)
     textLabel.Size = UDim2.new(1, 0, 1, 0)
     textLabel.BackgroundTransparency = 1
     textLabel.Text = "柜子"
-    textLabel.TextColor3 = Color3.new(1, 1, 0)
-    textLabel.TextSize = 14
+    textLabel.TextColor3 = Color3.new(1, 1, 0) -- 黄色文字
     textLabel.TextScaled = true
     textLabel.Font = Enum.Font.SourceSansBold
     textLabel.Parent = billboard
