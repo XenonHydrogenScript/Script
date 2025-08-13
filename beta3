@@ -734,7 +734,7 @@ ts:Toggle("柜子透视", false, function(state)
     ToolshedEsp = state
     for _, cham in pairs(ToolshedHighlights) do
         cham.Enabled = state
-        -- 同步显示文本的开关状态
+        -- 同步文本显示状态
         if cham.TextGui then
             cham.TextGui.Enabled = state
         end
@@ -742,7 +742,7 @@ ts:Toggle("柜子透视", false, function(state)
 end)
 
 local function ApplyToolshedHighlights(inst)
-    -- 创建高亮（原有代码）
+    -- 原有高亮代码
     local cham = Instance.new("Highlight")
     cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
     cham.FillColor = Color3.new(245, 245, 245)
@@ -753,29 +753,29 @@ local function ApplyToolshedHighlights(inst)
     cham.Enabled = ToolshedEsp
     cham.RobloxLocked = true
 
-    -- 添加文本显示（新增部分）
-    local billboard = Instance.new("BillboardGui")
-    billboard.Name = "TextGui"
-    billboard.Parent = cham -- 绑定到高亮对象
-    billboard.Adornee = inst -- 跟随目标
-    billboard.Size = UDim2.new(0, 200, 0, 50) -- 文本框大小
-    billboard.AlwaysOnTop = true -- 始终显示在最上层
-    billboard.Enabled = ToolshedEsp -- 与高亮同步开关
+    -- 新增：用SurfaceGui显示文本（贴在物体表面）
+    local surfaceGui = Instance.new("SurfaceGui")
+    surfaceGui.Name = "TextGui"
+    surfaceGui.Parent = cham
+    surfaceGui.Adornee = inst -- 附着的物体
+    surfaceGui.Face = Enum.NormalId.Top -- 贴在物体的“顶部”面（可改：Front/Back/Left/Right/Bottom）
+    surfaceGui.CanvasSize = Vector2.new(200, 50) -- 画布大小
+    surfaceGui.Enabled = ToolshedEsp -- 与高亮同步开关
 
     local textLabel = Instance.new("TextLabel")
-    textLabel.Parent = billboard
-    textLabel.Size = UDim2.new(1, 0, 1, 0) -- 占满整个Billboard
-    textLabel.Text = "柜子" -- 要显示的文本
+    textLabel.Parent = surfaceGui
+    textLabel.Size = UDim2.new(1, 0, 1, 0) -- 占满整个SurfaceGui
+    textLabel.Text = "柜子" -- 显示的文本
     textLabel.TextScaled = true -- 自动缩放文字
     textLabel.BackgroundTransparency = 1 -- 背景透明
-    textLabel.TextColor3 = Color3.new(1, 1, 1) -- 文字颜色（白色）
+    textLabel.TextColor3 = Color3.new(1, 1, 1) -- 白色文字
 
-    cham.TextGui = billboard -- 存个引用方便控制开关
+    cham.TextGui = surfaceGui -- 保存引用，方便控制开关
 
     return cham
 end
 
--- 以下是原有监听和初始化代码，无需修改
+-- 以下监听和初始化代码不变
 task.spawn(function()
     workspace.CurrentRooms.DescendantAdded:Connect(function(inst)
         if inst.Name == "Toolshed" then
