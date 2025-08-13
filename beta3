@@ -55,7 +55,7 @@ ImageButton.Position = UDim2.new(0.0235790554, 0, 0.466334164, 0)
 ImageButton.Size = UDim2.new(0, 50, 0, 50)
 ImageButton.Image = Icon
 ImageButton.BackgroundTransparency = 0.5
-ImageButton.Parent = ImageButton
+ImageButton.Parent = OpenUI
 ImageButton.Draggable = true 
 
 UICorner.CornerRadius = UDim.new(0, 25)
