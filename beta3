@@ -3,27 +3,11 @@ newLBLG.Name = "NewLBLG"
 newLBLG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 newLBLG.Enabled = true
 
-local shadowCount = 5
-for i = 1, shadowCount do
-    local shadow = Instance.new("TextLabel", newLBLG)
-    shadow.Name = "Shadow_" .. i
-    shadow.BackgroundTransparency = 1
-    shadow.AnchorPoint = Vector2.new(0.5, 1)
-    shadow.Position = UDim2.new(0.5, i*0.5, 1, -5 + i*0.5)
-    shadow.Size = UDim2.new(0, 150, 0, 30)
-    shadow.Font = Enum.Font.GothamSemibold
-    shadow.Text = "Fluorine star Script"
-    shadow.TextColor3 = Color3.new(0, 0, 0)
-    shadow.TextTransparency = i / (shadowCount + 2)
-    shadow.TextScaled = true
-    shadow.TextSize = 14
-    shadow.TextWrapped = true
-    shadow.Visible = true
-end
-
 local newLBL = Instance.new("TextLabel", newLBLG)
 newLBL.Name = "NewLBL"
+newLBL.BackgroundColor3 = Color3.new(1, 1, 1)
 newLBL.BackgroundTransparency = 1
+newLBL.BorderColor3 = Color3.new(0, 0, 0)
 newLBL.AnchorPoint = Vector2.new(0.5, 1)
 newLBL.Position = UDim2.new(0.5, 0, 1, -5)
 newLBL.Size = UDim2.new(0, 150, 0, 30)
@@ -98,7 +82,6 @@ local Players = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
 local player = Players.LocalPlayer
 local gui = player:WaitForChild("PlayerGui")
-local isPlayingYGY = false
 
 local Whitelisted = false;
 
@@ -120,7 +103,7 @@ ImageButton.BackgroundColor3 = Color3.fromRGB(5, 6, 7)
 ImageButton.BackgroundTransparency = 0.500 
 ImageButton.Position = UDim2.new(0.0235790554, 0, 0.466334164, 0) 
 ImageButton.Size = UDim2.new(0, 50, 0, 50) 
-ImageButton.Image = "rbxassetid://123167109577756" 
+ImageButton.Image = "rbxassetid://10800748312" 
 ImageButton.Draggable = true 
 UICorner.CornerRadius = UDim.new(0, 200) 
 UICorner.Parent = ImageButton 
@@ -136,7 +119,7 @@ else
 end)
 
 local sound = Instance.new("Sound")
-sound.SoundId = "rbxassetid://17208361335"
+sound.SoundId = "rbxassetid://70527060448610"
 sound.Parent = game:GetService("SoundService")
 sound.Volume = 1
 sound:Play()
@@ -154,7 +137,6 @@ local gn = win:Tab("| 功能 |")
 local zs = win:Tab("| 自身 |")
 local ts = win:Tab("| 调试 |")
 local gm = win:Tab("| 购买 |")
-local yy = win:Tab("| 音乐 |")
 
 xx:Label("作者:Fluorstar")
 xx:Label("服务器ID:" .. game.GameId .. ".")
@@ -1356,19 +1338,6 @@ ts:Toggle("屏蔽曼德拉草", false, function(state)
         conn = workspace.DescendantAdded:Connect(hideMandrake)
     end
 end)
-ts:Toggle("屏蔽护林员", false, function(state)
-    if conn2 then conn2:Disconnect(); conn2 = nil end
-
-    if state then
-        removeGroundskeepers()
-        
-        conn2 = workspace.DescendantAdded:Connect(function(obj)
-            if table.find(GroundskeeperNames, obj.Name) then
-                obj:Destroy()
-            end
-        end)
-    end
-end)
 
 ts:Toggle("屏蔽闪电", false, function(state)
     if state then
@@ -1405,20 +1374,6 @@ coroutine.wrap(function()
     end
 end)()
 
-yy:Label("摇滚乐")
-yy:Toggle("播放摇滚乐[短]", false, function(state)
-    isPlayingYGY = state
-    -- 状态变化时直接控制音频播放/暂停
-    if ygy then
-        ygy.Playing = isPlayingYGY
-    end
-end)
-
-local ygy = Instance.new("Sound")
-ygy.SoundId = "rbxassetid://1846684175"
-ygy.Parent = game:GetService("SoundService")
-ygy.Volume = 1
-
 --/Extended code/
 
 --/CREATE PART/
@@ -1445,21 +1400,6 @@ local function hideMandrake(obj)
         if scream then scream:Destroy() end
     end
 end
-
---/NO GROUNDSKEEPER/
-local conn2
-local function removeGroundskeepers()
-    local searchLocations = {workspace, workspace.CurrentRooms}
-    for _, loc in ipairs(searchLocations) do
-        if not loc then continue end
-        for _, obj in ipairs(loc:GetDescendants()) do
-            if table.find(GroundskeeperNames, obj.Name) then
-                obj:Destroy()
-            end
-        end
-    end
-end
-
    else
     CoreGui:SetCore("SendNotification", {
         Title = "Fluorine star error",
