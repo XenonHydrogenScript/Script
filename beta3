@@ -1338,6 +1338,19 @@ ts:Toggle("屏蔽曼德拉草", false, function(state)
         conn = workspace.DescendantAdded:Connect(hideMandrake)
     end
 end)
+ts:Toggle("屏蔽护林员", false, function(state)
+    if conn2 then conn2:Disconnect(); conn2 = nil end
+
+    if state then
+        removeGroundskeepers()
+        
+        conn2 = workspace.DescendantAdded:Connect(function(obj)
+            if table.find(GroundskeeperNames, obj.Name) then
+                obj:Destroy()
+            end
+        end)
+    end
+end)
 
 ts:Toggle("屏蔽闪电", false, function(state)
     if state then
@@ -1400,6 +1413,21 @@ local function hideMandrake(obj)
         if scream then scream:Destroy() end
     end
 end
+
+--/NO GROUNDSKEEPER/
+local conn2
+local function removeGroundskeepers()
+    local searchLocations = {workspace, workspace.CurrentRooms}
+    for _, loc in ipairs(searchLocations) do
+        if not loc then continue end
+        for _, obj in ipairs(loc:GetDescendants()) do
+            if table.find(GroundskeeperNames, obj.Name) then
+                obj:Destroy()
+            end
+        end
+    end
+end
+
    else
     CoreGui:SetCore("SendNotification", {
         Title = "Fluorine star error",
