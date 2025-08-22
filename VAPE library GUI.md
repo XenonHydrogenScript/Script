@@ -105,7 +105,6 @@ function lib:Window(text, preset, closebind)
     Main.Size = UDim2.new(0, 0, 0, 0)
     Main.ClipsDescendants = true
     Main.Visible = true
-    Main.Image = "rbxassetid://118325133574153"
 
     TabHold.Name = "TabHold"
     TabHold.Parent = Main
