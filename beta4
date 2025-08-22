@@ -281,7 +281,9 @@ end
 
 local currentMobs, currentMobNames = getMobs()
 local selectedMob = currentMobNames[1] or nil
-
+local currentMobs, currentMobNames = {}, {}
+local selectedMob
+local MobDropdown -- 存储 Dropdown 实例
 --Bandage Esp Class
 local BandageHighlights = {}
 local BandageTexts = {}
@@ -1563,19 +1565,31 @@ gn:Button("回到营地", function()
             plr.Character.HumanoidRootPart.CFrame = CFrame.new(13.287, 3.999, 0.362)
         end
     end)
-gn:Dropdown("选择孩子", {Values = currentMobNames, Multi = false, AllowNone = true}, function(options)
-    selectedMob = options[#options] or currentMobNames[1] or nil
+MobDropdown = gn:Dropdown("选择孩子", {
+    Values = currentMobNames,
+    Multi = false,
+    AllowNone = true
+}, function(options)
+    -- 处理空状态的占位符（如 "[无有效孩子]"）
+    local val = options[#options]
+    selectedMob = val ~= "[无有效孩子]" and val or nil
 end)
+
+-- 3. 刷新按钮逻辑（修复 MobDropdown 调用 + 空状态优化）
 gn:Button("刷新列表", false, function()
-        currentMobs, currentMobNames = getMobs()
-        if #currentMobNames > 0 then
-            selectedMob = currentMobNames[1]
-            MobDropdown:Refresh(currentMobNames)
-        else
-            selectedMob = nil
-            MobDropdown:Refresh({ "无查找到孩子" })
-        end
-    end)
+    currentMobs, currentMobNames = getMobs()
+    
+    -- 构建显示的选项（区分空状态）
+    local displayValues
+    if #currentMobNames > 0 then
+        displayValues = currentMobNames
+        selectedMob = currentMobNames[1]
+    else
+        displayValues = { "[无有效孩子]" }
+        selectedMob = nil
+    end
+    MobDropdown:Refresh(displayValues)
+end)
 gn:Button("传送到孩子", false, function()
         if selectedMob and currentMobs then
             for i, name in ipairs(currentMobNames) do
