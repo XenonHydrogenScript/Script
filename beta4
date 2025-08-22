@@ -265,6 +265,20 @@ local uis = game:GetService("UserInputService")
 local rs = game:GetService("ReplicatedStorage")
 local char = plr.Character or plr.CharacterAdded:Wait()
 
+local function getMobs()
+    local mobs = {}
+    local mobNames = {}
+    local index = 1
+    for _, character in ipairs(workspace:WaitForChild("Characters"):GetChildren()) do
+        if character.Name:match("^Lost Child") and character:GetAttribute("Lost") == true then
+            table.insert(mobs, character)
+            table.insert(mobNames, character.Name)
+            index = index + 1
+        end
+    end
+    return mobs, mobNames
+end
+
 local currentMobs, currentMobNames = getMobs()
 local selectedMob = currentMobNames[1] or nil
 
