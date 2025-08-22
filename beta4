@@ -1492,7 +1492,67 @@ gn:Textbox("设置速度", "16", function(Value)
         plr.Character.Humanoid.WalkSpeed = speed 
     end  
 end)
-gn:Toggle("自动砍树",false,function(s)settings.autoFarm=s if s then spawn(function()local t=game:GetService("ReplicatedStorage").RemoteEvents:FindFirstChild("ToolDamageObject")while settings.autoFarm do local e={}if workspace:FindFirstChild("Map")then local a=workspace.Map:FindFirstChild("Landmarks")or workspace.Map:FindFirstChild("Foliage")if a then for i,v in pairs(a:GetChildren())do if v.Name=="Small Tree"and v:FindFirstChild("Trunk")then table.insert(e,v)end end end end for i,o in pairs(e)do if not settings.autoFarm then break end if o and o.Parent then local l=plr.Character local r=l and l:FindFirstChild("HumanoidRootPart")if r and o:FindFirstChild("Trunk")then r.CFrame=o.Trunk.CFrame*CFrame.new(3,0,0)wait(0.3)local n=nil if plr:FindFirstChild("Inventory")then n=plr.Inventory:FindFirstChild("Old Axe")or plr.Inventory:FindFirstChild("Good Axe")end if n then if n.Parent==plr.Backpack then n.Parent=l wait(0.2)end while o.Parent and settings.autoFarm do pcall(function()n:Activate()if t then t:InvokeServer(o,n,"1_8264699301",o.Trunk.CFrame)end end)wait(0.8)end end end wait(0.5)end wait(2)end end)end end)
+gn:Toggle("自动砍树", false, function(state)
+    settings.autoFarm = state
+    if state then
+        spawn(function()
+            local toolDamage = game:GetService("ReplicatedStorage").RemoteEvents:FindFirstChild("ToolDamageObject")
+            while settings.autoFarm do
+                local trees = {}
+
+                -- find trees
+                if workspace:FindFirstChild("Map") then
+                    local landmarks = workspace.Map:FindFirstChild("Landmarks") or workspace.Map:FindFirstChild("Foliage")
+                    if landmarks then
+                        for i, v in pairs(landmarks:GetChildren()) do
+                            if v.Name == "Small Tree" and v:FindFirstChild("Trunk") then
+                                table.insert(trees, v)
+                            end
+                        end
+                    end
+                end
+
+                -- farm trees
+                for i, tree in pairs(trees) do
+                    if not settings.autoFarm then break end
+                    if tree and tree.Parent then
+                        local myChar = plr.Character
+                        local root = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                        if root and tree:FindFirstChild("Trunk") then
+                            root.CFrame = tree.Trunk.CFrame * CFrame.new(3, 0, 0)
+                            wait(0.3)
+
+                            -- get axe
+                            local axe = nil
+                            if plr:FindFirstChild("Inventory") then
+                                axe = plr.Inventory:FindFirstChild("Old Axe") or plr.Inventory:FindFirstChild("Good Axe")
+                            end
+
+                            if axe then
+                                if axe.Parent == plr.Backpack then
+                                    axe.Parent = myChar
+                                    wait(0.2)
+                                end
+
+                                while tree.Parent and settings.autoFarm do
+                                    pcall(function()
+                                        axe:Activate()
+                                        if toolDamage then
+                                            toolDamage:InvokeServer(tree, axe, "1_8264699301", tree.Trunk.CFrame)
+                                        end
+                                    end)
+                                    wait(0.8)
+                                end
+                            end
+                        end
+                    end
+                    wait(0.5)
+                end
+                wait(2)
+            end
+        end)
+    end
+end)
 gn:Toggle("狼的碰撞箱", false, function(state)
         settings.hitboxes.wolves = state
     end)
