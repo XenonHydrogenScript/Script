@@ -268,18 +268,51 @@ local char = plr.Character or plr.CharacterAdded:Wait()
 local function getMobs()
     local mobs = {}
     local mobNames = {}
-    local index = 1
-    for _, character in ipairs(workspace:WaitForChild("Characters"):GetChildren()) do
+    local characters = workspace:WaitForChild("Characters", 10) -- 最多等10秒
+    if not characters then -- 等不到就返回空
+        warn("Characters 容器未找到，无法获取怪物")
+        return mobs, mobNames 
+    end
+    for _, character in ipairs(characters:GetChildren()) do
         if character.Name:match("^Lost Child") and character:GetAttribute("Lost") == true then
             table.insert(mobs, character)
             table.insert(mobNames, character.Name)
-            index = index + 1
         end
     end
     return mobs, mobNames
 end
 
-local currentMobs, currentMobNames = getMobs()
+local function getMobs()
+    local mobs = {}
+    local mobNames = {}
+    local characters = workspace:WaitForChild("Characters", 5)  -- 先尝试等待获取 Characters，最多等5秒
+    if characters then
+        for _, character in ipairs(characters:GetChildren()) do
+            if character.Name:match("^Lost Child") and character:GetAttribute("Lost") == true then
+                table.insert(mobs, character)
+                table.insert(mobNames, character.Name)
+            end
+        end
+    end
+    return mobs, mobNames
+end
+
+-- 获取怪物信息，若没获取到合适的则循环等待
+local currentMobs, currentMobNames
+local getMobsTimeout = 3
+local getMobsStartTime = tick()
+while true do
+    currentMobs, currentMobNames = getMobs()
+    if #currentMobs > 0 then  
+        break
+    end
+    if tick() - getMobsStartTime > getMobsTimeout then
+        warn("No File")
+        break
+    end
+    wait(1)
+end
+
 local selectedMob = currentMobNames[1] or nil
 
 local instantInteractEnabled = false
