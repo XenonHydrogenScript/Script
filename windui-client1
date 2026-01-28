@@ -1114,7 +1114,6 @@ end
 
 
 -- */  Other  /* --
--- 先粘贴你的自定义通知函数完整代码（覆盖原有 WindUI 通知逻辑）
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -1151,7 +1150,8 @@ local function createNotification(title, text, duration, options)
 
     local notification = Instance.new("Frame")
     notification.Size = UDim2.new(0, 350, 0, 80)
-    notification.Position = UDim2.new(1, 20, 1, -100)
+    -- 初始位置：屏幕正上方外侧（水平居中，垂直不可见）
+    notification.Position = UDim2.new(0.5, -175, -0.1, 0)
     notification.BackgroundColor3 = bgColor
     notification.BorderSizePixel = 0
     notification.Parent = ScreenGui
@@ -1232,10 +1232,11 @@ local function createNotification(title, text, duration, options)
         end)
     end
 
+    -- 滑入动画：从上方往下移到屏幕正上方（距离顶部20像素）
     local slideIn = TweenService:Create(
         notification,
         TweenInfo.new(0.5, Enum.EasingStyle.Quint),
-        {Position = UDim2.new(1, -370, 1, -100)}
+        {Position = UDim2.new(0.5, -175, 0, 20)}
     )
     slideIn:Play()
 
@@ -1245,10 +1246,11 @@ local function createNotification(title, text, duration, options)
         {Size = UDim2.new(0, 0, 0, 3)}
     ):Play()
 
+    -- 滑出动画：回到上方外侧不可见区域
     local slideOut = TweenService:Create(
         notification,
         TweenInfo.new(0.5, Enum.EasingStyle.Quint),
-        {Position = UDim2.new(1, 20, 1, -100)}
+        {Position = UDim2.new(0.5, -175, -0.1, 0)}
     )
 
     closeButton.MouseButton1Click:Connect(function()
@@ -1265,46 +1267,36 @@ end
 
 -- 替换 WindUI 原有 Notify 方法，保持调用格式兼容
 function WindUI:Notify(params)
-    -- 解析 WindUI 原有参数格式，映射到自定义函数
     local title = params.Title or "通知"
     local text = params.Content or params.Desc or ""
     local duration = params.Duration or 5
     local options = {}
 
-    -- 处理图标（支持 WindUI 图标名或自定义资源 ID）
+    -- 图标映射（可按需扩展）
     if params.Icon then
-        -- 若传入的是系统图标名（如 "check"），可手动映射到资源 ID（按需扩展）
         local iconMap = {
             ["check"] = "rbxassetid://6031068421",
-            ["refresh-cw"] = "rbxassetid://123456789", -- 示例，需替换为实际 ID
-            ["solar:bell-bold"] = "rbxassetid://987654321" -- 示例
+            ["refresh-cw"] = "rbxassetid://132438947521974", -- 实际可用图标ID
+            ["solar:bell-bold"] = "rbxassetid://119096461016615", -- 实际可用图标ID
+            ["info-circle-bold"] = "rbxassetid://119096461016615"
         }
         options.Icon = iconMap[params.Icon] or params.Icon
     end
 
-    -- 处理样式（根据标题或自定义参数匹配 Error/Success 样式）
+    -- 样式匹配
     if params.Type == "Error" then
         options = NotificationStyles.Error
     elseif params.Type == "Success" then
         options = NotificationStyles.Success
     else
-        -- 自定义颜色（优先使用 params 传入的颜色）
         options.BackgroundColor = params.BackgroundColor or options.BackgroundColor
         options.TitleColor = params.TitleColor or options.TitleColor
         options.Sound = params.Sound or options.Sound
     end
 
-    -- 调用你的自定义通知函数
     createNotification(title, text, duration, options)
 end
 
--- 示例：保持原有 WindUI 调用方式不变，自动适配新样式
--- WindUI:Notify({
---     Title = "配置保存成功",
---     Content = "默认配置已保存到本地",
---     Type = "Success", -- 可选：指定 Error/Success 预设样式
---     Duration = 3
--- })
 
 
 do
