@@ -1114,189 +1114,214 @@ end
 
 
 -- */  Other  /* --
+-- Services
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
 local SoundService = game:GetService("SoundService")
 
+local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "CustomNotifications"
 ScreenGui.Parent = PlayerGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
+-- Notification styles
 local NotificationStyles = {
-    Error = {
-        Icon = "rbxassetid://131198217929605",
-        BackgroundColor = Color3.fromRGB(50, 20, 20),
-        TitleColor = Color3.fromRGB(255, 85, 85),
-        Sound = "rbxassetid://8499261098"
-    },
-    Success = {
-        Icon = "rbxassetid://6031068421",
-        BackgroundColor = Color3.fromRGB(20, 50, 20),
-        TitleColor = Color3.fromRGB(85, 255, 85),
-        Sound = "rbxassetid://4590662766"
-    },
+	Error = {
+		Icon = "rbxassetid://131198217929605",
+		BackgroundColor = Color3.fromRGB(50, 20, 20),
+		TitleColor = Color3.fromRGB(255, 85, 85),
+		Sound = "rbxassetid://8499261098"
+	},
+	Success = {
+		Icon = "rbxassetid://6031068421",
+		BackgroundColor = Color3.fromRGB(20, 50, 20),
+		TitleColor = Color3.fromRGB(85, 255, 85),
+		Sound = "rbxassetid://4590662766"
+	}
 }
 
-local activeNotifications = {}
+-- 判断横竖屏
+local function isLandscape()
+	local size = workspace.CurrentCamera.ViewportSize
+	return size.X > size.Y
+end
 
+-- 创建通知
 local function createNotification(title, text, duration, options)
-    local options = options or {}
-    local icon = options.Icon
-    local bgColor = options.BackgroundColor or Color3.fromRGB(40, 40, 40)
-    local titleColor = options.TitleColor or Color3.fromRGB(255, 85, 85)
-    local soundId = options.Sound
+	options = options or {}
 
-    local notification = Instance.new("Frame")
-    notification.Size = UDim2.new(0, 350, 0, 80)
-    -- 初始位置：屏幕正上方外侧（水平居中，垂直不可见）
-    notification.Position = UDim2.new(0.5, -175, -0.1, 0)
-    notification.BackgroundColor3 = bgColor
-    notification.BorderSizePixel = 0
-    notification.Parent = ScreenGui
-    notification.ZIndex = 100
-    notification.ClipsDescendants = true
+	local icon = options.Icon
+	local bgColor = options.BackgroundColor or Color3.fromRGB(40, 40, 40)
+	local titleColor = options.TitleColor or Color3.fromRGB(255, 85, 85)
+	local soundId = options.Sound
+	duration = duration or 5
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
-    corner.Parent = notification
+	-- Frame
+	local notification = Instance.new("Frame")
+	notification.Size = UDim2.new(0, 350, 0, 80)
+	notification.BackgroundColor3 = bgColor
+	notification.BorderSizePixel = 0
+	notification.Parent = ScreenGui
+	notification.ZIndex = 100
+	notification.ClipsDescendants = true
 
-    local shadow = Instance.new("UIStroke")
-    shadow.Color = Color3.new(0, 0, 0)
-    shadow.Transparency = 0.8
-    shadow.Thickness = 2
-    shadow.Parent = notification
+	-- 圆角
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 12)
+	corner.Parent = notification
 
-    if icon then
-        local iconImage = Instance.new("ImageLabel")
-        iconImage.Size = UDim2.new(0, 30, 0, 30)
-        iconImage.Position = UDim2.new(0, 15, 0.5, -15)
-        iconImage.Image = icon
-        iconImage.BackgroundTransparency = 1
-        iconImage.Parent = notification
-    end
+	-- 描边
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.new(0, 0, 0)
+	stroke.Transparency = 0.8
+	stroke.Thickness = 2
+	stroke.Parent = notification
 
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Text = title
-    titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.TextColor3 = titleColor
-    titleLabel.TextSize = 18
-    titleLabel.Position = UDim2.new(0, icon and 60 or 20, 0, 15)
-    titleLabel.Size = UDim2.new(1, -40, 0, 25)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    titleLabel.Parent = notification
+	-- Icon
+	if icon then
+		local iconImage = Instance.new("ImageLabel")
+		iconImage.Size = UDim2.new(0, 30, 0, 30)
+		iconImage.Position = UDim2.new(0, 15, 0.5, -15)
+		iconImage.Image = icon
+		iconImage.BackgroundTransparency = 1
+		iconImage.Parent = notification
+	end
 
-    local textLabel = Instance.new("TextLabel")
-    textLabel.Text = text
-    textLabel.Font = Enum.Font.Gotham
-    textLabel.TextColor3 = Color3.new(0.9, 0.9, 0.9)
-    textLabel.TextSize = 14
-    textLabel.Position = UDim2.new(0, icon and 60 or 20, 0, 40)
-    textLabel.Size = UDim2.new(1, -40, 0, 30)
-    textLabel.BackgroundTransparency = 1
-    textLabel.TextXAlignment = Enum.TextXAlignment.Left
-    textLabel.TextWrapped = true
-    textLabel.Parent = notification
+	-- Title
+	local titleLabel = Instance.new("TextLabel")
+	titleLabel.Text = title
+	titleLabel.Font = Enum.Font.GothamBold
+	titleLabel.TextColor3 = titleColor
+	titleLabel.TextSize = 18
+	titleLabel.Position = UDim2.new(0, icon and 60 or 20, 0, 15)
+	titleLabel.Size = UDim2.new(1, -40, 0, 25)
+	titleLabel.BackgroundTransparency = 1
+	titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	titleLabel.Parent = notification
 
-    local progressBar = Instance.new("Frame")
-    progressBar.Size = UDim2.new(1, -20, 0, 3)
-    progressBar.Position = UDim2.new(0, 10, 1, -8)
-    progressBar.BackgroundColor3 = titleColor
-    progressBar.BorderSizePixel = 0
-    progressBar.Parent = notification
+	-- Content
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Text = text
+	textLabel.Font = Enum.Font.Gotham
+	textLabel.TextColor3 = Color3.fromRGB(230, 230, 230)
+	textLabel.TextSize = 14
+	textLabel.Position = UDim2.new(0, icon and 60 or 20, 0, 40)
+	textLabel.Size = UDim2.new(1, -40, 0, 30)
+	textLabel.BackgroundTransparency = 1
+	textLabel.TextWrapped = true
+	textLabel.TextXAlignment = Enum.TextXAlignment.Left
+	textLabel.Parent = notification
 
-    local progressCorner = Instance.new("UICorner")
-    progressCorner.CornerRadius = UDim.new(1, 0)
-    progressCorner.Parent = progressBar
+	-- Progress bar
+	local progressBar = Instance.new("Frame")
+	progressBar.Size = UDim2.new(1, -20, 0, 3)
+	progressBar.Position = UDim2.new(0, 10, 1, -8)
+	progressBar.BackgroundColor3 = titleColor
+	progressBar.BorderSizePixel = 0
+	progressBar.Parent = notification
 
-    local closeButton = Instance.new("TextButton")
-    closeButton.Size = UDim2.new(0, 20, 0, 20)
-    closeButton.Position = UDim2.new(1, -25, 0, 10)
-    closeButton.BackgroundTransparency = 1
-    closeButton.Text = "关闭"
-    closeButton.TextColor3 = Color3.new(1, 1, 1)
-    closeButton.TextSize = 16
-    closeButton.Font = Enum.Font.GothamBold
-    closeButton.Parent = notification
+	local progressCorner = Instance.new("UICorner")
+	progressCorner.CornerRadius = UDim.new(1, 0)
+	progressCorner.Parent = progressBar
 
-    if soundId then
-        local sound = Instance.new("Sound")
-        sound.SoundId = soundId
-        sound.Volume = 3
-        sound.Parent = notification
-        sound:Play()
-        sound.Ended:Connect(function()
-            sound:Destroy()
-        end)
-    end
+	-- Close button
+	local closeButton = Instance.new("TextButton")
+	closeButton.Size = UDim2.new(0, 20, 0, 20)
+	closeButton.Position = UDim2.new(1, -25, 0, 10)
+	closeButton.BackgroundTransparency = 1
+	closeButton.Text = "×"
+	closeButton.TextColor3 = Color3.new(1, 1, 1)
+	closeButton.TextSize = 18
+	closeButton.Font = Enum.Font.GothamBold
+	closeButton.Parent = notification
 
-    -- 滑入动画：从上方往下移到屏幕正上方（距离顶部20像素）
-    local slideIn = TweenService:Create(
-        notification,
-        TweenInfo.new(0.5, Enum.EasingStyle.Quint),
-        {Position = UDim2.new(0.5, -175, 0, 20)}
-    )
-    slideIn:Play()
+	-- Sound
+	if soundId then
+		local sound = Instance.new("Sound")
+		sound.SoundId = soundId
+		sound.Volume = 2
+		sound.Parent = notification
+		sound:Play()
+		sound.Ended:Connect(function()
+			sound:Destroy()
+		end)
+	end
 
-    TweenService:Create(
-        progressBar,
-        TweenInfo.new(duration or 5, Enum.EasingStyle.Linear),
-        {Size = UDim2.new(0, 0, 0, 3)}
-    ):Play()
+	-- =============================
+	-- 位置 & Tween（关键部分）
+	-- =============================
 
-    -- 滑出动画：回到上方外侧不可见区域
-    local slideOut = TweenService:Create(
-        notification,
-        TweenInfo.new(0.5, Enum.EasingStyle.Quint),
-        {Position = UDim2.new(0.5, -175, -0.1, 0)}
-    )
+	local slideIn, slideOut
 
-    closeButton.MouseButton1Click:Connect(function()
-        slideOut:Play()
-        slideOut.Completed:Wait()
-        notification:Destroy()
-    end)
+	if isLandscape() then
+		-- 横屏：顶部中间
+		notification.Position = UDim2.new(0.5, -175, 0, -100)
 
-    task.wait(duration or 5)
-    slideOut:Play()
-    slideOut.Completed:Wait()
-    notification:Destroy()
+		slideIn = TweenService:Create(
+			notification,
+			TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+			{Position = UDim2.new(0.5, -175, 0, 20)}
+		)
+
+		slideOut = TweenService:Create(
+			notification,
+			TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
+			{Position = UDim2.new(0.5, -175, 0, -100)}
+		)
+	else
+		-- 竖屏：右下角
+		notification.Position = UDim2.new(1, 20, 1, -100)
+
+		slideIn = TweenService:Create(
+			notification,
+			TweenInfo.new(0.5, Enum.EasingStyle.Quint),
+			{Position = UDim2.new(1, -370, 1, -100)}
+		)
+
+		slideOut = TweenService:Create(
+			notification,
+			TweenInfo.new(0.4, Enum.EasingStyle.Quint),
+			{Position = UDim2.new(1, 20, 1, -100)}
+		)
+	end
+
+	slideIn:Play()
+
+	-- Progress tween
+	TweenService:Create(
+		progressBar,
+		TweenInfo.new(duration, Enum.EasingStyle.Linear),
+		{Size = UDim2.new(0, 0, 0, 3)}
+	):Play()
+
+	-- Close logic
+	closeButton.MouseButton1Click:Connect(function()
+		slideOut:Play()
+		slideOut.Completed:Wait()
+		notification:Destroy()
+	end)
+
+	task.delay(duration, function()
+		if notification.Parent then
+			slideOut:Play()
+			slideOut.Completed:Wait()
+			notification:Destroy()
+		end
+	end)
 end
 
--- 替换 WindUI 原有 Notify 方法，保持调用格式兼容
-function WindUI:Notify(params)
-    local title = params.Title or "通知"
-    local text = params.Content or params.Desc or ""
-    local duration = params.Duration or 5
-    local options = {}
-
-    -- 图标映射（可按需扩展）
-    if params.Icon then
-        local iconMap = {
-            ["check"] = "rbxassetid://6031068421",
-            ["refresh-cw"] = "rbxassetid://132438947521974", -- 实际可用图标ID
-            ["solar:bell-bold"] = "rbxassetid://119096461016615", -- 实际可用图标ID
-            ["info-circle-bold"] = "rbxassetid://119096461016615"
-        }
-        options.Icon = iconMap[params.Icon] or params.Icon
-    end
-
-    -- 样式匹配
-    if params.Type == "Error" then
-        options = NotificationStyles.Error
-    elseif params.Type == "Success" then
-        options = NotificationStyles.Success
-    else
-        options.BackgroundColor = params.BackgroundColor or options.BackgroundColor
-        options.TitleColor = params.TitleColor or options.TitleColor
-        options.Sound = params.Sound or options.Sound
-    end
-
-    createNotification(title, text, duration, options)
-end
-
+-- =============================
+-- 示例调用
+-- =============================
+createNotification(
+	"成功",
+	"这是一个横屏从顶部弹出的通知",
+	5,
+	NotificationStyles.Success
+)
 
 
 
