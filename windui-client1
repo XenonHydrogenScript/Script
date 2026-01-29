@@ -1115,213 +1115,187 @@ end
 
 -- */  Other  /* --
 -- Services
+-- Services
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local SoundService = game:GetService("SoundService")
+local RunService = game:GetService("RunService")
 
 local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
 
+--------------------------------------------------
 -- ScreenGui
+--------------------------------------------------
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "CustomNotifications"
+ScreenGui.Name = "HUDNotifications"
 ScreenGui.Parent = PlayerGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Notification styles
-local NotificationStyles = {
-	Error = {
-		Icon = "rbxassetid://131198217929605",
-		BackgroundColor = Color3.fromRGB(50, 20, 20),
-		TitleColor = Color3.fromRGB(255, 85, 85),
-		Sound = "rbxassetid://8499261098"
-	},
-	Success = {
-		Icon = "rbxassetid://6031068421",
-		BackgroundColor = Color3.fromRGB(20, 50, 20),
-		TitleColor = Color3.fromRGB(85, 255, 85),
-		Sound = "rbxassetid://4590662766"
-	}
-}
+--------------------------------------------------
+-- 配置（HUD / 硬朗风）
+--------------------------------------------------
+local SIZE = UDim2.new(0, 260, 0, 40)
+local START_Y = -70
+local BASE_Y = -50
+local GAP = 8
+local MAX_STACK = 5
 
--- 判断横竖屏
-local function isLandscape()
-	local size = workspace.CurrentCamera.ViewportSize
-	return size.X > size.Y
-end
+local active = {}
 
--- 创建通知
-local function createNotification(title, text, duration, options)
-	options = options or {}
-
-	local icon = options.Icon
-	local bgColor = options.BackgroundColor or Color3.fromRGB(40, 40, 40)
-	local titleColor = options.TitleColor or Color3.fromRGB(255, 85, 85)
-	local soundId = options.Sound
-	duration = duration or 5
-
-	-- Frame
-	local notification = Instance.new("Frame")
-	notification.Size = UDim2.new(0, 350, 0, 80)
-	notification.BackgroundColor3 = bgColor
-	notification.BorderSizePixel = 0
-	notification.Parent = ScreenGui
-	notification.ZIndex = 100
-	notification.ClipsDescendants = true
-
-	-- 圆角
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 12)
-	corner.Parent = notification
-
-	-- 描边
-	local stroke = Instance.new("UIStroke")
-	stroke.Color = Color3.new(0, 0, 0)
-	stroke.Transparency = 0.8
-	stroke.Thickness = 2
-	stroke.Parent = notification
-
-	-- Icon
-	if icon then
-		local iconImage = Instance.new("ImageLabel")
-		iconImage.Size = UDim2.new(0, 30, 0, 30)
-		iconImage.Position = UDim2.new(0, 15, 0.5, -15)
-		iconImage.Image = icon
-		iconImage.BackgroundTransparency = 1
-		iconImage.Parent = notification
-	end
-
-	-- Title
-	local titleLabel = Instance.new("TextLabel")
-	titleLabel.Text = title
-	titleLabel.Font = Enum.Font.GothamBold
-	titleLabel.TextColor3 = titleColor
-	titleLabel.TextSize = 18
-	titleLabel.Position = UDim2.new(0, icon and 60 or 20, 0, 15)
-	titleLabel.Size = UDim2.new(1, -40, 0, 25)
-	titleLabel.BackgroundTransparency = 1
-	titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-	titleLabel.Parent = notification
-
-	-- Content
-	local textLabel = Instance.new("TextLabel")
-	textLabel.Text = text
-	textLabel.Font = Enum.Font.Gotham
-	textLabel.TextColor3 = Color3.fromRGB(230, 230, 230)
-	textLabel.TextSize = 14
-	textLabel.Position = UDim2.new(0, icon and 60 or 20, 0, 40)
-	textLabel.Size = UDim2.new(1, -40, 0, 30)
-	textLabel.BackgroundTransparency = 1
-	textLabel.TextWrapped = true
-	textLabel.TextXAlignment = Enum.TextXAlignment.Left
-	textLabel.Parent = notification
-
-	-- Progress bar
-	local progressBar = Instance.new("Frame")
-	progressBar.Size = UDim2.new(1, -20, 0, 3)
-	progressBar.Position = UDim2.new(0, 10, 1, -8)
-	progressBar.BackgroundColor3 = titleColor
-	progressBar.BorderSizePixel = 0
-	progressBar.Parent = notification
-
-	local progressCorner = Instance.new("UICorner")
-	progressCorner.CornerRadius = UDim.new(1, 0)
-	progressCorner.Parent = progressBar
-
-	-- Close button
-	local closeButton = Instance.new("TextButton")
-	closeButton.Size = UDim2.new(0, 20, 0, 20)
-	closeButton.Position = UDim2.new(1, -25, 0, 10)
-	closeButton.BackgroundTransparency = 1
-	closeButton.Text = "×"
-	closeButton.TextColor3 = Color3.new(1, 1, 1)
-	closeButton.TextSize = 18
-	closeButton.Font = Enum.Font.GothamBold
-	closeButton.Parent = notification
-
-	-- Sound
-	if soundId then
-		local sound = Instance.new("Sound")
-		sound.SoundId = soundId
-		sound.Volume = 2
-		sound.Parent = notification
-		sound:Play()
-		sound.Ended:Connect(function()
-			sound:Destroy()
-		end)
-	end
-
-	-- =============================
-	-- 位置 & Tween（关键部分）
-	-- =============================
-
-	local slideIn, slideOut
-
-	if isLandscape() then
-		-- 横屏：顶部中间
-		notification.Position = UDim2.new(0.5, -175, 0, -100)
-
-		slideIn = TweenService:Create(
-			notification,
-			TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-			{Position = UDim2.new(0.5, -175, 0, 20)}
-		)
-
-		slideOut = TweenService:Create(
-			notification,
-			TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
-			{Position = UDim2.new(0.5, -175, 0, -100)}
-		)
-	else
-		-- 竖屏：右下角
-		notification.Position = UDim2.new(1, 20, 1, -100)
-
-		slideIn = TweenService:Create(
-			notification,
-			TweenInfo.new(0.5, Enum.EasingStyle.Quint),
-			{Position = UDim2.new(1, -370, 1, -100)}
-		)
-
-		slideOut = TweenService:Create(
-			notification,
-			TweenInfo.new(0.4, Enum.EasingStyle.Quint),
-			{Position = UDim2.new(1, 20, 1, -100)}
-		)
-	end
-
-	slideIn:Play()
-
-	-- Progress tween
-	TweenService:Create(
-		progressBar,
-		TweenInfo.new(duration, Enum.EasingStyle.Linear),
-		{Size = UDim2.new(0, 0, 0, 3)}
-	):Play()
-
-	-- Close logic
-	closeButton.MouseButton1Click:Connect(function()
-		slideOut:Play()
-		slideOut.Completed:Wait()
-		notification:Destroy()
-	end)
-
-	task.delay(duration, function()
-		if notification.Parent then
-			slideOut:Play()
-			slideOut.Completed:Wait()
-			notification:Destroy()
+--------------------------------------------------
+-- HUD 轻震动（短促）
+--------------------------------------------------
+local function hudShake(frame, strength, time)
+	task.spawn(function()
+		local start = tick()
+		local basePos = frame.Position
+		while tick() - start < time and frame.Parent do
+			frame.Position = basePos + UDim2.new(
+				0,
+				math.random(-strength, strength),
+				0,
+				0
+			)
+			RunService.RenderStepped:Wait()
+		end
+		if frame.Parent then
+			frame.Position = basePos
 		end
 	end)
 end
 
--- =============================
--- 示例调用
--- =============================
-createNotification(
-	"成功",
-	"这是一个横屏从顶部弹出的通知",
-	5,
-	NotificationStyles.Success
-)
+--------------------------------------------------
+-- 更新堆叠（冷静位移）
+--------------------------------------------------
+local function updateStack()
+	for i, frame in ipairs(active) do
+		local y = BASE_Y + (i - 1) * (SIZE.Y.Offset + GAP)
+
+		TweenService:Create(
+			frame,
+			TweenInfo.new(0.25, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out),
+			{
+				Position = UDim2.new(0.5, -SIZE.X.Offset / 2, 0, y),
+				BackgroundTransparency = 0.1 + (i - 1) * 0.08
+			}
+		):Play()
+	end
+end
+
+--------------------------------------------------
+-- 创建通知（核心接口）
+--------------------------------------------------
+local function createNotification(text, duration, soundId)
+	duration = duration or 3
+
+	--------------------------------------------------
+	-- Frame
+	--------------------------------------------------
+	local frame = Instance.new("Frame")
+	frame.Size = SIZE
+	frame.Position = UDim2.new(0.5, -SIZE.X.Offset / 2, 0, START_Y)
+	frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+	frame.BackgroundTransparency = 0.05
+	frame.BorderSizePixel = 0
+	frame.ZIndex = 100
+	frame.Parent = ScreenGui
+	frame.ClipsDescendants = true
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 14)
+	corner.Parent = frame
+
+	--------------------------------------------------
+	-- HUD 描边
+	--------------------------------------------------
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = 2
+	stroke.Color = Color3.fromRGB(0, 200, 255)
+	stroke.Transparency = 0.15
+	stroke.Parent = frame
+
+	--------------------------------------------------
+	-- 文本
+	--------------------------------------------------
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, -24, 1, 0)
+	label.Position = UDim2.new(0, 12, 0, 0)
+	label.BackgroundTransparency = 1
+	label.Text = text
+	label.Font = Enum.Font.GothamBold
+	label.TextSize = 14
+	label.TextColor3 = Color3.fromRGB(240, 240, 240)
+	label.TextWrapped = true
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.TextYAlignment = Enum.TextYAlignment.Center
+	label.Parent = frame
+
+	--------------------------------------------------
+	-- 音效
+	--------------------------------------------------
+	if soundId then
+		local sound = Instance.new("Sound")
+		sound.SoundId = soundId
+		sound.Volume = 1.6
+		sound.Parent = frame
+		sound:Play()
+	end
+
+	--------------------------------------------------
+	-- 极速入场（HUD 风）
+	--------------------------------------------------
+	TweenService:Create(
+		frame,
+		TweenInfo.new(0.18, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out),
+		{Position = UDim2.new(0.5, -SIZE.X.Offset / 2, 0, BASE_Y)}
+	):Play()
+
+	hudShake(frame, 1, 0.08)
+
+	--------------------------------------------------
+	-- 插入堆叠
+	--------------------------------------------------
+	table.insert(active, 1, frame)
+	if #active > MAX_STACK then
+		local old = table.remove(active)
+		old:Destroy()
+	end
+
+	updateStack()
+
+	--------------------------------------------------
+	-- 自动关闭
+	--------------------------------------------------
+	task.delay(duration, function()
+		if not frame.Parent then return end
+
+		for i, v in ipairs(active) do
+			if v == frame then
+				table.remove(active, i)
+				break
+			end
+		end
+
+		TweenService:Create(
+			frame,
+			TweenInfo.new(0.15, Enum.EasingStyle.Exponential, Enum.EasingDirection.In),
+			{
+				Position = UDim2.new(0.5, -SIZE.X.Offset / 2, 0, START_Y),
+				BackgroundTransparency = 1
+			}
+		):Play()
+
+		task.wait(0.15)
+		frame:Destroy()
+		updateStack()
+	end)
+end
+
+--------------------------------------------------
+-- 对外使用示例（你项目里就这样调）
+--------------------------------------------------
+createNotification("测试", 3, "rbxassetid://4590657391")
+task.wait(0.4)
+createNotification("测试", 3, "rbxassetid://4590662766")
 
 
 
