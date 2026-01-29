@@ -1115,7 +1115,6 @@ end
 
 -- */  Other  /* --
 -- Services
--- Services
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -1131,7 +1130,7 @@ ScreenGui.Parent = PlayerGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 --------------------------------------------------
--- 配置（HUD / 硬朗风）
+-- 配置（HUD / 非 iOS）
 --------------------------------------------------
 local SIZE = UDim2.new(0, 260, 0, 40)
 local START_Y = -70
@@ -1142,29 +1141,20 @@ local MAX_STACK = 5
 local active = {}
 
 --------------------------------------------------
--- HUD 轻震动（短促）
+-- HUD 轻震动
 --------------------------------------------------
 local function hudShake(frame, strength, time)
 	task.spawn(function()
 		local start = tick()
-		local basePos = frame.Position
 		while tick() - start < time and frame.Parent do
-			frame.Position = basePos + UDim2.new(
-				0,
-				math.random(-strength, strength),
-				0,
-				0
-			)
+			frame.Position += UDim2.new(0, math.random(-strength, strength), 0, 0)
 			RunService.RenderStepped:Wait()
-		end
-		if frame.Parent then
-			frame.Position = basePos
 		end
 	end)
 end
 
 --------------------------------------------------
--- 更新堆叠（冷静位移）
+-- 更新堆叠（冷静、硬朗）
 --------------------------------------------------
 local function updateStack()
 	for i, frame in ipairs(active) do
@@ -1182,9 +1172,9 @@ local function updateStack()
 end
 
 --------------------------------------------------
--- 创建通知（核心接口）
+-- ✅ 对外通知接口（替换完成）
 --------------------------------------------------
-local function createNotification(text, duration, soundId)
+function Notify(text, duration, soundId)
 	duration = duration or 3
 
 	--------------------------------------------------
@@ -1220,7 +1210,7 @@ local function createNotification(text, duration, soundId)
 	label.Size = UDim2.new(1, -24, 1, 0)
 	label.Position = UDim2.new(0, 12, 0, 0)
 	label.BackgroundTransparency = 1
-	label.Text = text
+	label.Text = tostring(text)
 	label.Font = Enum.Font.GothamBold
 	label.TextSize = 14
 	label.TextColor3 = Color3.fromRGB(240, 240, 240)
@@ -1230,18 +1220,20 @@ local function createNotification(text, duration, soundId)
 	label.Parent = frame
 
 	--------------------------------------------------
-	-- 音效
+	-- 音效系统（防叠爆）
 	--------------------------------------------------
 	if soundId then
 		local sound = Instance.new("Sound")
 		sound.SoundId = soundId
 		sound.Volume = 1.6
+		sound.RollOffMaxDistance = 100
 		sound.Parent = frame
 		sound:Play()
+		game:GetService("Debris"):AddItem(sound, 3)
 	end
 
 	--------------------------------------------------
-	-- 极速入场（HUD 风）
+	-- 极速 HUD 入场
 	--------------------------------------------------
 	TweenService:Create(
 		frame,
@@ -1255,9 +1247,10 @@ local function createNotification(text, duration, soundId)
 	-- 插入堆叠
 	--------------------------------------------------
 	table.insert(active, 1, frame)
+
 	if #active > MAX_STACK then
 		local old = table.remove(active)
-		old:Destroy()
+		if old then old:Destroy() end
 	end
 
 	updateStack()
@@ -1289,13 +1282,6 @@ local function createNotification(text, duration, soundId)
 		updateStack()
 	end)
 end
-
---------------------------------------------------
--- 对外使用示例（你项目里就这样调）
---------------------------------------------------
-createNotification("测试", 3, "rbxassetid://4590657391")
-task.wait(0.4)
-createNotification("测试", 3, "rbxassetid://4590662766")
 
 
 
