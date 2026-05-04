@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title> </title> <!-- 隐藏标题 -->
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+body{
+  position: relative;
+  padding:40px 15px 120px;
+  color:#fff;
+  font-family:sans-serif;
+  overflow-x: hidden;
+  background:#111;
+}
+
+/* 🌈 动态彩虹背景 - 透明度已调整为0.85 */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:-1;
+
+  background: linear-gradient(
+    120deg,
+    #ff0000,
+    #ff7f00,
+    #ffff00,
+    #00ff00,
+    #00ffff,
+    #0000ff,
+    #8b00ff,
+    #ff0000
+  );
+
+  background-size: 400% 400%;
+  animation: rainbowMove 18s linear infinite;
+
+  opacity: 0.85;
+  filter: blur(60px);
+}
+
+@keyframes rainbowMove{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+/* ===== 原有样式 ===== */
+
+#scaleWrap{
+  transition: transform 0.25s ease;
+  transform-origin: center center;
+}
+
+.show-wrap{
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.scroll-box{
+  display: flex;
+  gap: 18px;
+  padding: 0 15px;
+  height: 100%;
+  align-items: center;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+.scroll-box::-webkit-scrollbar{display:none;}
+
+.item{
+  flex-shrink: 0;
+  height: 180px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #222;
+  position: relative;
+}
+.item img, .item video, .item .code-preview {
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 代码预览样式 */
+.code-preview {
+  width: 100%;
+  height: 100%;
+  background: #1e1e1e;
+  color: #fff;
+  padding: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.code-language {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.code-preview pre {
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.4;
+}
+
+/* 文件类型图标 */
+.file-type-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  color: rgba(255, 255, 255, 0.3);
+  z-index: 1;
+}
+
+.file-name {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+/* 底部按钮区域 */
+.upload-btns {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  z-index: 100;
+  padding: 0 15px;
+  flex-wrap: wrap;
+}
+
+.upload-btn {
+  padding: 12px 18px;
+  border-radius: 36px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  transition: 0.3s ease;
+  min-width: 120px;
+  text-align: center;
+}
+
+.upload-btn:active {
+  transform: scale(0.94);
+}
+
+#uploadBtn {
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.3), rgba(0, 188, 212, 0.3));
+  color: white;
+}
+
+#saveToGitHubBtn {
+  background: linear-gradient(135deg, rgba(45, 85, 255, 0.3), rgba(83, 51, 237, 0.3));
+  color: white;
+}
+
+#cloudGalleryBtn {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.3), rgba(255, 193, 7, 0.3));
+  color: white;
+}
+
+#fileInput{display:none;}
+
+/* 删除弹窗 */
+.delete-pop{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(8px);
+  padding:8px 16px;
+  border-radius:12px;
+  display:none;
+}
+/* 删除按钮按压反馈 */
+.del-btn{
+  background:#f44336;
+  color:#fff;
+  border:none;
+  padding:6px 14px;
+  border-radius:8px;
+  transition: transform 0.15s ease;
+  cursor: pointer;
+}
+.del-btn:active{
+  transform: scale(0.9);
+}
+
+/* GitHub配置弹窗样式 */
+.github-config-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.github-config-overlay.show {
+  opacity: 1;
+  display: flex;
+}
+
+.github-config-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.github-config-overlay.show .github-config-container {
+  transform: translateY(0);
+}
+
+.github-config-container h3 {
+  margin: 0 0 20px 0;
+  color: white;
+  text-align: center;
+  font-size: 20px;
+}
+
+.github-form-group {
+  margin-bottom: 20px;
+}
+
+.github-form-group label {
+  display: block;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.github-form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  font-size: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.github-form-group input:focus {
+  outline: none;
+  border-color: rgba(33, 150, 243, 0.8);
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.github-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.github-btn {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  min-width: 100px;
+}
+
+.github-btn.primary {
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.9), rgba(0, 188, 212, 0.9));
+  border: none;
+}
+
+#reconfigGithubBtn {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.8), rgba(255, 87, 34, 0.8));
+  border: none;
+  color: white;
+}
+
+#reconfigGithubBtn:hover {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 1), rgba(255, 87, 34, 1));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
+}
+
+.github-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.github-btn:active {
+  transform: translateY(0);
+}
+
+.github-info {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.github-info a {
+  color: #2196f3;
+  text-decoration: none;
+}
+
+.github-info a:hover {
+  text-decoration: underline;
+}
+
+.github-status {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  text-align: center;
+  display: none;
+  font-size: 14px;
+}
+
+.github-status.show {
+  display: block;
+}
+
+.github-status.success {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.github-status.error {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+}
+
+.github-status.loading {
+  background: rgba(33, 150, 243, 0.2);
+  color: #2196f3;
+}
+
+/* 自定义毛玻璃提示框样式 - 提高z-index到4000 */
+.custom-alert {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4000; /* 提高z-index */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-alert.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.custom-alert-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.custom-alert-content {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 32px 24px 24px;
+  min-width: 280px;
+  max-width: 85%;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-alert.active .custom-alert-content {
+  transform: translateY(0) scale(1);
+}
+
+.custom-alert-icon {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 48px;
+  line-height: 1;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.7; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 0.7; transform: scale(0.95); }
+}
+
+.custom-alert-message {
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 24px;
+  padding: 0 8px;
+  font-weight: 500;
+}
+
+.custom-alert-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.custom-alert-btn {
+  padding: 10px 28px;
+  border-radius: 16px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.custom-alert-btn:active {
+  transform: scale(0.95);
+}
+
+.custom-alert-btn.confirm {
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.9), rgba(0, 188, 212, 0.9));
+  color: white;
+}
+
+.custom-alert-btn.confirm:hover {
+  background: linear-gradient(135deg, rgba(33, 150, 243, 1), rgba(0, 188, 212, 1));
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+/* 云端相册样式 */
+.cloud-gallery-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(15px);
+  z-index: 3000;
+  display: none;
+  flex-direction: column;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cloud-gallery-overlay.show {
+  opacity: 1;
+  display: flex;
+}
+
+.cloud-gallery-header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cloud-gallery-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+}
+
+.cloud-gallery-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.2s ease;
+}
+
+.cloud-gallery-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+.cloud-gallery-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.cloud-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding-bottom: 20px;
+}
+
+.cloud-item {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.cloud-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cloud-file-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cloud-file-info {
+  width: 100%;
+  text-align: center;
+}
+
+.cloud-file-name {
+  font-size: 12px;
+  color: white;
+  font-weight: 500;
+  margin-bottom: 5px;
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
+  max-height: 2.6em;
+}
+
+.cloud-file-size {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 10px;
+}
+
+.cloud-item-actions {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+  justify-content: center;
+}
+
+.cloud-action-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 60px;
+}
+
+.cloud-action-btn.view {
+  background: rgba(33, 150, 243, 0.8);
+  color: white;
+}
+
+.cloud-action-btn.delete {
+  background: rgba(244, 67, 54, 0.8);
+  color: white;
+}
+
+.cloud-action-btn:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.cloud-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.cloud-empty-icon {
+  font-size: 60px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.cloud-loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cloud-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #2196f3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>
+</head>
+
+<body>
+
+<div id="scaleWrap">
+  <div class="show-wrap"><div class="scroll-box"></div></div>
+  <div class="show-wrap"><div class="scroll-box"></div></div>
+  <div class="show-wrap"><div class="scroll-box"></div></div>
+</div>
+
+<!-- 底部按钮区域 -->
+<div class="upload-btns">
+  <div class="upload-btn" id="uploadBtn">选择文件上架</div>
+  <div class="upload-btn" id="saveToGitHubBtn">保存到GitHub</div>
+  <div class="upload-btn" id="cloudGalleryBtn">云端文件库</div>
+</div>
+
+<input type="file" id="fileInput" multiple>
+<canvas id="colorCanvas" width="1" height="1" style="display:none;"></canvas>
+
+<!-- GitHub配置弹窗 -->
+<div class="github-config-overlay" id="githubConfigOverlay">
+  <div class="github-config-container">
+    <h3>配置GitHub上传</h3>
+    <div class="github-form-group">
+      <label for="githubToken">GitHub Personal Access Token</label>
+      <input type="password" id="githubToken" placeholder="输入你的GitHub Token" />
+      <div class="github-info">
+        需要创建一个有<code>repo</code>权限的Token。<br>
+        访问：<a href="https://github.com/settings/tokens" target="_blank">GitHub Token设置</a>
+      </div>
+    </div>
+    <div class="github-form-group">
+      <label for="githubOwner">仓库所有者用户名</label>
+      <input type="text" id="githubOwner" placeholder="例如：your-username" />
+    </div>
+    <div class="github-form-group">
+      <label for="githubRepo">仓库名称</label>
+      <input type="text" id="githubRepo" placeholder="例如：my-gallery" />
+    </div>
+    <div class="github-form-group">
+      <label for="githubPath">保存路径（可选）</label>
+      <input type="text" id="githubPath" placeholder="例如：gallery/files/" />
+    </div>
+    <div class="github-form-group">
+      <label for="githubBranch">分支名称</label>
+      <input type="text" id="githubBranch" placeholder="默认为：main" value="main" />
+    </div>
+    
+    <div id="githubStatus" class="github-status"></div>
+    
+    <div class="github-form-actions">
+      <button class="github-btn" id="cancelGithubBtn">取消</button>
+      <button class="github-btn" id="testGithubBtn">测试连接</button>
+      <button class="github-btn" id="reconfigGithubBtn">重新配置</button>
+      <button class="github-btn primary" id="saveGithubBtn">保存配置</button>
+    </div>
+    
+    <div class="github-info">
+      <strong>注意：</strong>Token会保存在浏览器本地存储中，不会发送到其他服务器。<br>
+      上传的文件将保存在你指定的GitHub仓库中。
+    </div>
+  </div>
+</div>
+
+<!-- 云端相册弹窗 -->
+<div class="cloud-gallery-overlay" id="cloudGalleryOverlay">
+  <div class="cloud-gallery-header">
+    <div class="cloud-gallery-title">云端文件库</div>
+    <button class="cloud-gallery-close" id="closeCloudGallery">×</button>
+  </div>
+  <div class="cloud-gallery-content" id="cloudGalleryContent">
+    <div class="cloud-loading" id="cloudLoading">
+      <div class="cloud-spinner"></div>
+      正在加载云端文件...
+    </div>
+    <div class="cloud-empty" id="cloudEmpty" style="display: none;">
+      <div class="cloud-empty-icon">📁</div>
+      <div>云端文件库为空</div>
+      <div style="font-size: 14px; margin-top: 10px;">请先上传文件到GitHub</div>
+    </div>
+    <div class="cloud-gallery-grid" id="cloudGalleryGrid" style="display: none;"></div>
+  </div>
+</div>
+
+<!-- 自定义提示框 -->
+<div id="customAlert" class="custom-alert">
+  <div class="custom-alert-overlay"></div>
+  <div class="custom-alert-content">
+    <div class="custom-alert-icon">⚠️</div>
+    <div class="custom-alert-message" id="alertMessage">请选择文件！</div>
+    <div class="custom-alert-buttons">
+      <button class="custom-alert-btn confirm" id="alertConfirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const uploadBtn = document.getElementById('uploadBtn');
+const saveToGitHubBtn = document.getElementById('saveToGitHubBtn');
+const cloudGalleryBtn = document.getElementById('cloudGalleryBtn');
+const fileInput = document.getElementById('fileInput');
+const boxList = document.querySelectorAll('.scroll-box');
+
+// GitHub配置相关元素
+const githubConfigOverlay = document.getElementById('githubConfigOverlay');
+const githubTokenInput = document.getElementById('githubToken');
+const githubOwnerInput = document.getElementById('githubOwner');
+const githubRepoInput = document.getElementById('githubRepo');
+const githubPathInput = document.getElementById('githubPath');
+const githubBranchInput = document.getElementById('githubBranch');
+const githubStatus = document.getElementById('githubStatus');
+const saveGithubBtn = document.getElementById('saveGithubBtn');
+const cancelGithubBtn = document.getElementById('cancelGithubBtn');
+const testGithubBtn = document.getElementById('testGithubBtn');
+const reconfigGithubBtn = document.getElementById('reconfigGithubBtn');
+
+// 云端相册相关元素
+const cloudGalleryOverlay = document.getElementById('cloudGalleryOverlay');
+const closeCloudGallery = document.getElementById('closeCloudGallery');
+const cloudGalleryContent = document.getElementById('cloudGalleryContent');
+const cloudLoading = document.getElementById('cloudLoading');
+const cloudEmpty = document.getElementById('cloudEmpty');
+const cloudGalleryGrid = document.getElementById('cloudGalleryGrid');
+
+// 自定义提示框元素
+const customAlert = document.getElementById('customAlert');
+const alertMessage = document.getElementById('alertMessage');
+const alertConfirm = document.getElementById('alertConfirm');
+const alertOverlay = document.querySelector('.custom-alert-overlay');
+
+const canvas = document.getElementById('colorCanvas');
+const ctx = canvas.getContext('2d');
+
+let imgColors = [];
+let boxIndex = 0;
+let uploadedFiles = [];
+let githubConfig = null;
+let cloudFiles = [];
+
+// 文件类型图标映射
+const fileIconMap = {
+  // 图片
+  'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️', 'webp': '🖼️', 'svg': '🖼️', 'bmp': '🖼️',
+  // 视频
+  'mp4': '🎬', 'webm': '🎬', 'mov': '🎬', 'avi': '🎬', 'mkv': '🎬', 'flv': '🎬',
+  // 音频
+  'mp3': '🎵', 'wav': '🎵', 'ogg': '🎵', 'flac': '🎵', 'm4a': '🎵',
+  // 文档
+  'pdf': '📄', 'doc': '📄', 'docx': '📄', 'txt': '📄', 'rtf': '📄',
+  // 电子表格
+  'xls': '📊', 'xlsx': '📊', 'csv': '📊',
+  // 演示文稿
+  'ppt': '📽️', 'pptx': '📽️',
+  // 代码文件
+  'js': '📜', 'jsx': '📜', 'ts': '📜', 'tsx': '📜', 'py': '📜', 'lua': '📜', 'luau': '📜',
+  'java': '📜', 'c': '📜', 'cpp': '📜', 'cs': '📜', 'php': '📜', 'rb': '📜', 'go': '📜',
+  'rs': '📜', 'swift': '📜', 'kt': '📜', 'scala': '📜', 'hs': '📜', 'pl': '📜', 'r': '📜',
+  'm': '📜', 'scm': '📜', 'clj': '📜', 'erl': '📜', 'ex': '📜', 'dart': '📜', 'v': '📜',
+  'zig': '📜', 'nim': '📜', 'cr': '📜', 'groovy': '📜', 'jl': '📜', 'f90': '📜', 'ada': '📜',
+  'cob': '📜', 'vb': '📜', 'pas': '📜', 'asm': '📜', 'sql': '📜',
+  // 脚本
+  'sh': '📜', 'bash': '📜', 'ps1': '📜', 'bat': '📜', 'fish': '📜', 'zsh': '📜',
+  // Web
+  'html': '🌐', 'htm': '🌐', 'css': '🎨', 'scss': '🎨', 'sass': '🎨', 'less': '🎨',
+  'xml': '📄', 'json': '📄', 'yaml': '📄', 'yml': '📄', 'toml': '📄',
+  // 配置文件
+  'ini': '⚙️', 'cfg': '⚙️', 'conf': '⚙️', 'config': '⚙️',
+  // 标记语言
+  'md': '📝', 'markdown': '📝',
+  // 数据
+  'csv': '📊', 'tsv': '📊',
+  // 压缩文件
+  'zip': '📦', 'rar': '📦', '7z': '📦', 'tar': '📦', 'gz': '📦', 'bz2': '📦', 'xz': '📦',
+  // 其他
+  'bin': '📦', 'exe': '⚙️', 'dmg': '💿', 'iso': '💿'
+};
+
+// 默认图标
+const defaultIcon = '📁';
+
+// 获取文件图标
+function getFileIcon(filename) {
+  const ext = filename.toLowerCase().split('.').pop();
+  return fileIconMap[ext] || defaultIcon;
+}
+
+// 格式化文件大小
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// 获取文件类型
+function getFileType(file) {
+  const name = file.name.toLowerCase();
+  const ext = name.split('.').pop();
+  
+  if (file.type.startsWith('image/')) return 'image';
+  if (file.type.startsWith('video/')) return 'video';
+  if (file.type.startsWith('audio/')) return 'audio';
+  if (ext in fileIconMap) return 'file';
+  return 'other';
+}
+
+// 加载GitHub配置
+function loadGithubConfig() {
+  const savedConfig = localStorage.getItem('githubUploadConfig');
+  if (savedConfig) {
+    try {
+      githubConfig = JSON.parse(savedConfig);
+      // 只填充非Token字段，Token不回显到输入框防泄露
+      githubOwnerInput.value = githubConfig.owner || '';
+      githubRepoInput.value = githubConfig.repo || '';
+      githubPathInput.value = githubConfig.path || '';
+      githubBranchInput.value = githubConfig.branch || 'main';
+      // 输入框清空，只显示星号占位
+      githubTokenInput.value = '';
+    } catch (e) {
+      console.error('Failed to load GitHub config:', e);
+    }
+  } else {
+    githubOwnerInput.value = 'XenonHydrogenScript';
+    githubRepoInput.value = 'cloud-gallery';
+    githubPathInput.value = 'gallery/';
+    githubBranchInput.value = 'main';
+    githubTokenInput.value = '';
+  }
+}
+
+// 重新配置GitHub
+function reconfigureGitHub() {
+  // 清除localStorage中的配置
+  localStorage.removeItem('githubUploadConfig');
+  
+  // 重置githubConfig对象
+  githubConfig = null;
+  
+  // 清空输入框
+  githubTokenInput.value = '';
+  githubOwnerInput.value = '';
+  githubRepoInput.value = '';
+  githubPathInput.value = '';
+  githubBranchInput.value = 'main';
+  
+  // 显示成功消息
+  showGitHubStatus('配置已清除，请重新输入！', 'success');
+  
+  // 聚焦到Token输入框
+  setTimeout(() => {
+    githubTokenInput.focus();
+  }, 100);
+}
+
+// 测试GitHub连接
+async function testGitHubConnection() {
+  const config = {
+    token: githubTokenInput.value.trim(),
+    owner: githubOwnerInput.value.trim(),
+    repo: githubRepoInput.value.trim(),
+    branch: githubBranchInput.value.trim() || 'main'
+  };
+  
+  if (!config.token || !config.owner || !config.repo) {
+    showGitHubStatus('请填写Token、用户名和仓库名！', 'error');
+    return;
+  }
+  
+  showGitHubStatus('正在测试连接...', 'loading');
+  
+  try {
+    const apiUrl = `https://api.github.com/repos/${config.owner}/${config.repo}`;
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Authorization': `token ${config.token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      showGitHubStatus(`连接成功！仓库: ${data.full_name}`, 'success');
+    } else if (response.status === 404) {
+      showGitHubStatus('仓库不存在！请检查用户名和仓库名', 'error');
+    } else if (response.status === 401) {
+      showGitHubStatus('Token无效或已过期！', 'error');
+    } else {
+      showGitHubStatus(`连接失败: ${response.status}`, 'error');
+    }
+  } catch (error) {
+    showGitHubStatus(`网络错误: ${error.message}`, 'error');
+  }
+}
+
+// 保存GitHub配置
+function saveGithubConfig() {
+  const config = {
+    token: githubTokenInput.value.trim(),
+    owner: githubOwnerInput.value.trim(),
+    repo: githubRepoInput.value.trim(),
+    path: githubPathInput.value.trim(),
+    branch: githubBranchInput.value.trim() || 'main'
+  };
+  
+  if (!config.token || !config.owner || !config.repo) {
+    showGitHubStatus('请填写所有必填字段！', 'error');
+    return;
+  }
+  
+  githubConfig = config;
+  localStorage.setItem('githubUploadConfig', JSON.stringify(config));
+  showGitHubStatus('配置保存成功！', 'success');
+  
+  setTimeout(() => {
+    hideGitHubConfig();
+  }, 1500);
+}
+
+// 显示GitHub配置弹窗
+function showGitHubConfig() {
+  loadGithubConfig();
+  
+  // 检查是否已有配置
+  const hasConfig = localStorage.getItem('githubUploadConfig');
+  if (hasConfig) {
+    // 已有配置，显示重新配置按钮
+    reconfigGithubBtn.style.display = 'block';
+  } else {
+    // 没有配置，隐藏重新配置按钮
+    reconfigGithubBtn.style.display = 'none';
+  }
+  
+  githubConfigOverlay.classList.add('show');
+}
+
+// 隐藏GitHub配置弹窗
+function hideGitHubConfig() {
+  githubConfigOverlay.classList.remove('show');
+}
+
+// 显示GitHub状态
+function showGitHubStatus(message, type = 'info') {
+  githubStatus.textContent = message;
+  githubStatus.className = 'github-status ' + type;
+  githubStatus.classList.add('show');
+  
+  if (type === 'error' || type === 'success') {
+    setTimeout(() => {
+      githubStatus.classList.remove('show');
+    }, 3000);
+  }
+}
+
+// 自定义提示框函数
+function showAlert(message) {
+  alertMessage.textContent = message;
+  customAlert.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => {
+    alertConfirm.focus();
+  }, 100);
+}
+
+// 隐藏提示框函数
+function hideAlert() {
+  customAlert.classList.remove('active');
+  document.body.style.overflow = 'auto';
+}
+
+// 将文件转换为Base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+  });
+}
+
+// 获取文件扩展名
+function getFileExtension(filename) {
+  return filename.split('.').pop().toLowerCase();
+}
+
+// 获取MIME类型扩展名
+function getMimeExtension(mimeType) {
+  const mimeMap = {
+    'image/jpeg': 'jpg',
+    'image/jpg': 'jpg',
+    'image/png': 'png',
+    'image/gif': 'gif',
+    'image/webp': 'webp',
+    'image/svg+xml': 'svg',
+    'video/mp4': 'mp4',
+    'video/webm': 'webm',
+    'video/ogg': 'ogv',
+    'video/quicktime': 'mov',
+    'video/x-msvideo': 'avi',
+    'audio/mpeg': 'mp3',
+    'audio/wav': 'wav',
+    'audio/ogg': 'ogg',
+    'application/pdf': 'pdf',
+    'application/zip': 'zip',
+    'application/x-rar-compressed': 'rar',
+    'application/x-7z-compressed': '7z',
+    'application/x-tar': 'tar',
+    'application/gzip': 'gz'
+  };
+  return mimeMap[mimeType] || 'bin';
+}
+
+// 上传文件到GitHub
+async function uploadToGitHub() {
+  if (!githubConfig) {
+    showAlert('请先配置GitHub上传信息！');
+    showGitHubConfig();
+    return;
+  }
+  
+  if (uploadedFiles.length === 0) {
+    showAlert('没有可上传的内容！请先添加文件。');
+    return;
+  }
+  
+  showGitHubStatus('开始上传到GitHub...', 'loading');
+  
+  let successCount = 0;
+  let errorCount = 0;
+  const results = [];
+  
+  for (let i = 0; i < uploadedFiles.length; i++) {
+    const fileInfo = uploadedFiles[i];
+    
+    try {
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substring(2, 8);
+      const extension = getMimeExtension(fileInfo.file.type) || 
+                       getFileExtension(fileInfo.file.name) || 
+                       'bin';
+      const filename = `file_${timestamp}_${random}.${extension}`;
+      
+      let path = filename;
+      if (githubConfig.path && githubConfig.path.trim()) {
+        const cleanPath = githubConfig.path.trim();
+        path = cleanPath.endsWith('/') ? cleanPath + filename : cleanPath + '/' + filename;
+      }
+      
+      path = encodeURIComponent(path).replace(/%2F/g, '/').replace(/%20/g, '_');
+      
+      const base64Content = await fileToBase64(fileInfo.file);
+      
+      const apiUrl = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${path}`;
+      
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${githubConfig.token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github.v3+json'
+        },
+        body: JSON.stringify({
+          message: `Upload ${filename} via Gallery App - ${new Date().toISOString()}`,
+          content: base64Content,
+          branch: githubConfig.branch
+        })
+      });
+      
+      const responseData = await response.json();
+      
+      if (response.ok) {
+        successCount++;
+        results.push({
+          name: filename,
+          url: responseData.content.html_url,
+          sha: responseData.content.sha,
+          path: path,
+          status: 'success'
+        });
+        showGitHubStatus(`上传中... ${i + 1}/${uploadedFiles.length}`, 'loading');
+      } else {
+        errorCount++;
+        results.push({
+          name: filename,
+          error: responseData.message || 'Unknown error',
+          status: 'error'
+        });
+      }
+      
+    } catch (error) {
+      errorCount++;
+      results.push({
+        name: `文件${i + 1}`,
+        error: error.message,
+        status: 'error'
+      });
+    }
+  }
+  
+  if (successCount > 0) {
+    let resultMessage = `上传完成！\n成功: ${successCount} 个文件\n失败: ${errorCount} 个文件\n\n`;
+    
+    if (results.filter(r => r.status === 'success').length > 0) {
+      resultMessage += "成功文件链接:\n";
+      results.filter(r => r.status === 'success').forEach(r => {
+        resultMessage += `• ${r.name}: ${r.url}\n`;
+      });
+    }
+    
+    showGitHubStatus(`上传完成！成功: ${successCount} 个，失败: ${errorCount} 个`, 'success');
+    showAlert(resultMessage);
+  } else {
+    showGitHubStatus(`上传失败，请检查配置和网络`, 'error');
+    showAlert('上传失败！\n可能原因：\n1. Token无效或已过期\n2. 仓库不存在\n3. 没有写入权限\n4. 网络连接问题\n\n请检查GitHub配置。');
+  }
+}
+
+// 获取云端文件列表
+async function loadCloudFiles() {
+  if (!githubConfig) {
+    showAlert('请先配置GitHub上传信息！');
+    showCloudGallery();
+    showGitHubConfig();
+    return;
+  }
+  
+  cloudLoading.style.display = 'block';
+  cloudEmpty.style.display = 'none';
+  cloudGalleryGrid.style.display = 'none';
+  
+  try {
+    const path = githubConfig.path ? encodeURIComponent(githubConfig.path.trim()).replace(/%2F/g, '/') : '';
+    const apiUrl = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${path}`;
+    
+    console.log('获取云端文件URL:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Authorization': `Bearer ${githubConfig.token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    
+    if (response.ok) {
+      const files = await response.json();
+      console.log('GitHub返回的文件列表:', files);
+      
+      // 显示所有文件，不仅仅是图片和视频
+      cloudFiles = files.filter(file => file.type === 'file');
+      
+      console.log('过滤后的文件列表:', cloudFiles);
+      
+      displayCloudFiles();
+    } else {
+      const errorText = await response.text();
+      console.error('GitHub API错误响应:', errorText);
+      throw new Error(`获取文件列表失败: ${response.status} ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('加载云端文件失败:', error);
+    cloudEmpty.style.display = 'block';
+    cloudEmpty.innerHTML = `
+      <div class="cloud-empty-icon">❌</div>
+      <div>加载失败</div>
+      <div style="font-size: 14px; margin-top: 10px;">${error.message}</div>
+    `;
+  } finally {
+    cloudLoading.style.display = 'none';
+  }
+}
+
+// 显示云端文件
+function displayCloudFiles() {
+  if (cloudFiles.length === 0) {
+    cloudEmpty.style.display = 'block';
+    cloudGalleryGrid.style.display = 'none';
+    return;
+  }
+  
+  cloudEmpty.style.display = 'none';
+  cloudGalleryGrid.style.display = 'grid';
+  cloudGalleryGrid.innerHTML = '';
+  
+  cloudFiles.forEach(file => {
+    const item = document.createElement('div');
+    item.className = 'cloud-item';
+    
+    const fileIcon = getFileIcon(file.name);
+    const fileName = file.name;
+    const fileSize = file.size ? formatFileSize(file.size) : '未知大小';
+    const fileUrl = file.download_url;
+    
+    // 转义特殊字符
+    const safeName = fileName.replace(/'/g, "\\'").replace(/"/g, '\\"');
+    const safePath = file.path.replace(/'/g, "\\'").replace(/"/g, '\\"');
+    const safeSha = file.sha.replace(/'/g, "\\'").replace(/"/g, '\\"');
+    
+    item.innerHTML = `
+      <div class="cloud-file-icon">${fileIcon}</div>
+      <div class="cloud-file-info">
+        <div class="cloud-file-name" title="${fileName}">${fileName}</div>
+        <div class="cloud-file-size">${fileSize}</div>
+        <div class="cloud-item-actions">
+          <button class="cloud-action-btn view" onclick="viewCloudFile('${fileUrl}', '${safeName}')">查看</button>
+          <button class="cloud-action-btn delete" onclick="deleteCloudFile('${safePath}', '${safeSha}', '${safeName}')">删除</button>
+        </div>
+      </div>
+    `;
+    
+    cloudGalleryGrid.appendChild(item);
+  });
+}
+
+// 查看云端文件
+function viewCloudFile(url, name) {
+  window.open(url, '_blank');
+}
+
+// 删除云端文件
+async function deleteCloudFile(path, sha, name) {
+  if (!githubConfig) {
+    showAlert('请先配置GitHub上传信息！');
+    return;
+  }
+  
+  // 存储原始的确认按钮点击处理函数
+  const originalConfirmHandler = alertConfirm.onclick;
+  
+  // 显示自定义删除确认对话框
+  alertMessage.innerHTML = `确定要删除 "<strong>${name}</strong>" 吗？<br><br><small>此操作不可撤销！</small>`;
+  customAlert.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  
+  // 设置确认按钮的新处理函数
+  alertConfirm.onclick = async () => {
+    // 先隐藏确认对话框
+    customAlert.classList.remove('active');
+    document.body.style.overflow = 'auto';
+    
+    try {
+      // 修复路径编码：只编码路径段，不编码斜杠
+      const encodedPath = path.split('/').map(segment => encodeURIComponent(segment)).join('/');
+      const apiUrl = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${encodedPath}`;
+      
+      console.log('删除请求URL:', apiUrl);
+      console.log('文件路径:', path);
+      console.log('SHA:', sha);
+      
+      const response = await fetch(apiUrl, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `token ${githubConfig.token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github.v3+json'
+        },
+        body: JSON.stringify({
+          message: `Delete ${name} via Gallery App - ${new Date().toISOString()}`,
+          sha: sha,
+          branch: githubConfig.branch
+        })
+      });
+      
+      if (response.ok) {
+        // 从cloudFiles数组中移除被删除的文件
+        cloudFiles = cloudFiles.filter(file => file.path !== path);
+        
+        // 立即刷新云端相册显示
+        displayCloudFiles();
+        
+        // 显示成功消息
+        alertMessage.textContent = `文件 "${name}" 删除成功！`;
+        customAlert.classList.add('active');
+        
+        // 设置成功消息的确认按钮
+        alertConfirm.onclick = () => {
+          customAlert.classList.remove('active');
+          document.body.style.overflow = 'auto';
+          alertConfirm.onclick = originalConfirmHandler; // 恢复原始处理函数
+        };
+        
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `删除失败 (${response.status})`);
+      }
+    } catch (error) {
+      console.error('删除文件失败:', error);
+      alertMessage.textContent = `删除失败: ${error.message}`;
+      customAlert.classList.add('active');
+      
+      // 设置错误消息的确认按钮
+      alertConfirm.onclick = () => {
+        customAlert.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        alertConfirm.onclick = originalConfirmHandler; // 恢复原始处理函数
+      };
+    }
+  };
+  
+  // 设置取消按钮
+  const originalOverlayHandler = alertOverlay.onclick;
+  alertOverlay.onclick = () => {
+    customAlert.classList.remove('active');
+    document.body.style.overflow = 'auto';
+    alertConfirm.onclick = originalConfirmHandler; // 恢复原始处理函数
+    alertOverlay.onclick = originalOverlayHandler; // 恢复原始处理函数
+  };
+}
+
+// 显示云端相册
+function showCloudGallery() {
+  cloudGalleryOverlay.classList.add('show');
+  loadCloudFiles();
+}
+
+// 隐藏云端相册
+function hideCloudGallery() {
+  cloudGalleryOverlay.classList.remove('show');
+}
+
+// 事件监听
+saveToGitHubBtn.onclick = () => {
+  if (!githubConfig) {
+    showGitHubConfig();
+  } else {
+    uploadToGitHub();
+  }
+};
+
+cloudGalleryBtn.onclick = showCloudGallery;
+closeCloudGallery.onclick = hideCloudGallery;
+
+saveGithubBtn.onclick = saveGithubConfig;
+cancelGithubBtn.onclick = hideGitHubConfig;
+testGithubBtn.onclick = testGitHubConnection;
+reconfigGithubBtn.onclick = reconfigureGitHub;
+
+githubConfigOverlay.addEventListener('click', (e) => {
+  if (e.target === githubConfigOverlay) {
+    hideGitHubConfig();
+  }
+});
+
+cloudGalleryOverlay.addEventListener('click', (e) => {
+  if (e.target === cloudGalleryOverlay) {
+    hideCloudGallery();
+  }
+});
+
+// 初始的确认按钮点击事件
+alertConfirm.onclick = hideAlert;
+// 初始的遮罩层点击事件
+alertOverlay.onclick = hideAlert;
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (customAlert.classList.contains('active')) {
+      hideAlert();
+    }
+    if (githubConfigOverlay.classList.contains('show')) {
+      hideGitHubConfig();
+    }
+    if (cloudGalleryOverlay.classList.contains('show')) {
+      hideCloudGallery();
+    }
+  }
+});
+
+uploadBtn.onclick = () => fileInput.click();
+
+fileInput.onchange = e => {
+  const files = [...e.target.files];
+  
+  if (files.length === 0) {
+    showAlert('请选择文件！\n\n支持的文件类型：\n• 图片：JPG、PNG、GIF、WebP、SVG\n• 视频：MP4、WebM、OGG、MOV、AVI\n• 代码：JS、Python、Lua、HTML、CSS等\n• 文档：PDF、TXT、MD、JSON等\n• 压缩包：ZIP、RAR、7Z等\n• 音频：MP3、WAV、OGG等\n• 其他：几乎所有文件类型');
+    return;
+  }
+
+  if (files.length > 20) {
+    showAlert('一次最多只能上传20个文件！\n\n请减少文件数量后重试。');
+    return;
+  }
+
+  files.forEach(file => {
+    const url = URL.createObjectURL(file);
+    const fileType = getFileType(file);
+
+    const item = document.createElement('div');
+    item.className = 'item';
+    
+    if (fileType === 'image') {
+      item.innerHTML = `
+        <img src="${url}">
+        <div class="delete-pop">
+          <button class="del-btn">删除</button>
+        </div>
+      `;
+    } else if (fileType === 'video') {
+      item.innerHTML = `
+        <video src="${url}" muted loop autoplay playsinline></video>
+        <div class="delete-pop">
+          <button class="del-btn">删除</button>
+        </div>
+      `;
+    } else {
+      const icon = getFileIcon(file.name);
+      const fileTypeName = '文件';
+      const fileSize = formatFileSize(file.size);
+      
+      item.innerHTML = `
+        <div class="code-preview">
+          <div class="file-type-icon">${icon}</div>
+          <div class="file-name">${file.name} (${fileSize})</div>
+          <div style="text-align: center; padding: 20px; color: #888;">
+            ${fileTypeName}<br>
+            <small>${fileSize}</small>
+          </div>
+        </div>
+        <div class="delete-pop">
+          <button class="del-btn">删除</button>
+        </div>
+      `;
+    }
+
+    uploadedFiles.push({
+      url,
+      file,
+      fileType
+    });
+
+    bindLongPress(item);
+
+    item.querySelector('.del-btn').onclick = () => {
+      const index = uploadedFiles.findIndex(f => f.url === url);
+      if (index > -1) {
+        uploadedFiles.splice(index, 1);
+      }
+      URL.revokeObjectURL(url);
+      item.remove();
+      refreshAllImgs();
+    };
+
+    boxList[boxIndex].appendChild(item);
+    boxIndex = (boxIndex + 1) % boxList.length;
+  });
+
+  boxList.forEach(box => {
+    setTimeout(() => box.scrollLeft = box.scrollWidth, 100);
+  });
+
+  refreshAllImgs();
+  
+  if (files.length > 0) {
+    setTimeout(() => {
+      showAlert(`成功添加 ${files.length} 个文件到展示架！`);
+    }, 300);
+  }
+  
+  fileInput.value = '';
+};
+
+let timer = null;
+function bindLongPress(el) {
+  el.addEventListener('touchstart', () => {
+    timer = setTimeout(() => {
+      closeAll();
+      el.querySelector('.delete-pop').style.display = 'block';
+    }, 500);
+  });
+  el.addEventListener('touchend', () => clearTimeout(timer));
+  el.addEventListener('touchmove', () => clearTimeout(timer));
+}
+
+function closeAll() {
+  document.querySelectorAll('.delete-pop').forEach(p => p.style.display = 'none');
+}
+
+function refreshAllImgs() {
+  imgColors = [];
+  document.querySelectorAll('img').forEach(img => {
+    img.onload = async () => {
+      ctx.drawImage(img, 0, 0, 1, 1);
+      let d = ctx.getImageData(0, 0, 1, 1).data;
+      imgColors.push({ img, color: { r: d[0], g: d[1], b: d[2] } });
+    };
+  });
+  
+  document.querySelectorAll('video').forEach(video => {
+    video.addEventListener('loadeddata', () => {
+      try {
+        ctx.drawImage(video, 0, 0, 1, 1);
+        let d = ctx.getImageData(0, 0, 1, 1).data;
+        imgColors.push({ img: video, color: { r: d[0], g: d[1], b: d[2] } });
+      } catch(e) {
+        // 跨域或安全限制时跳过
+      }
+    });
+  });
+}
+
+function getTextColor(r, g, b) {
+  return (r * 299 + g * 587 + b * 114) / 1000 > 128 ? '#000' : '#fff';
+}
+
+function updateBtnColor() {
+  let max = 0, visible = null;
+  imgColors.forEach(({ img, color }) => {
+    let rect = img.getBoundingClientRect();
+    let area = Math.max(0,
+      Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0)
+    ) * Math.max(0,
+      Math.min(rect.right, innerWidth) - Math.max(rect.left, 0)
+    );
+    if (area > max) { max = area; visible = color; }
+  });
+
+  if (visible) {
+    uploadBtn.style.background = `rgba(${visible.r}, ${visible.g}, ${visible.b}, 0.3)`;
+    uploadBtn.style.color = getTextColor(visible.r, visible.g, visible.b);
+  }
+}
+
+window.addEventListener('scroll', () => {
+  closeAll();
+  updateBtnColor();
+});
+
+// 双指手势缩放
+let start = 0, scale = 1;
+
+function dist(e) {
+  let [a, b] = e.touches;
+  return Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+}
+
+document.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) start = dist(e);
+});
+
+document.addEventListener('touchmove', e => {
+  closeAll();
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    let now = dist(e);
+    scale *= now / start;
+    scale = Math.max(0.7, Math.min(1.3, scale));
+    document.getElementById('scaleWrap').style.transform = `scale(${scale})`;
+    start = now;
+  }
+}, { passive: false });
+
+// 隐藏标题
+window.addEventListener('load', () => {
+  loadGithubConfig();
+  // 确保标题被清空
+  document.title = '';
+  // 定期检查并清空标题
+  setInterval(() => {
+    if (document.title.trim() !== '') {
+      document.title = '';
+    }
+  }, 100);
+});
+</script>
+
+</body>
+</html>
